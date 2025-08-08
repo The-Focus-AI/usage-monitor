@@ -1,2 +1,3 @@
 # usage-monitor
-A new project created on 2025-08-08
+
+See `usage-monitor/README.md` for setup and details.

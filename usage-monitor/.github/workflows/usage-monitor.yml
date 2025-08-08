@@ -1,0 +1,46 @@
+name: Usage Monitor
+
+on:
+  schedule:
+    # Hourly runs at minute 5
+    - cron: '5 * * * *'
+    # Daily run at 16:05 UTC to emit the daily summary when balance >= threshold
+    - cron: '5 16 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run usage monitor
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BALANCE_ALERT_THRESHOLD_USD: ${{ vars.BALANCE_ALERT_THRESHOLD_USD || '10' }}
+          DAILY_POST_UTC_HOUR: '16'
+          __USAGE_MONITOR_STATE_BASE64: ${{ secrets.USAGE_MONITOR_STATE_BASE64 }}
+        run: |
+          node usage-monitor/scripts/check-balance.mjs | tee monitor.log
+
+      - name: Save state for next run (optional)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Extract the last JSON line and parse state_base64
+          STATE=$(tail -n 20 monitor.log | grep '"state_base64"' | tail -n 1 | sed -E 's/.*"state_base64":"([^"]+)".*/\1/')
+          if [ -n "$STATE" ]; then
+            echo "Captured state. You can store it as an organization or repo secret 'USAGE_MONITOR_STATE_BASE64' to prevent duplicate messages within the hour/day."
+            echo "state_base64=$STATE"
+          fi
