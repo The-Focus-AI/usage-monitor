@@ -1,0 +1,31 @@
+name: Usage Monitor
+
+on:
+  schedule:
+    # Hourly runs at minute 5. The script gates daily summary by hour to avoid duplicates.
+    - cron: '5 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Run usage monitor
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BALANCE_ALERT_THRESHOLD_USD: ${{ vars.BALANCE_ALERT_THRESHOLD_USD || '10' }}
+          DAILY_POST_UTC_HOUR: '16'
+        run: |
+          node scripts/check-balance.mjs
