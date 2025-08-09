@@ -1,0 +1,42 @@
+[tools]
+node = "24.2.0"
+pnpm = "10.12.3"
+
+[hooks]
+# Enabling corepack will install the `pnpm` package manager specified in your package.json
+# alternatively, you can also install `pnpm` with mise
+postinstall = 'npx corepack enable'
+
+[settings]
+# This must be enabled to make the hooks work
+experimental = true
+
+[env]
+_.path = ['./node_modules/.bin']
+_.file = ['.env']
+
+[tasks.pnpm-install]
+description = 'Installs dependencies with pnpm'
+run = 'pnpm install'
+sources = ['package.json', 'pnpm-lock.yaml', 'mise.toml']
+outputs = ['node_modules/.pnpm/lock.yaml']
+
+[tasks.dev]
+description = 'Calls your dev script in `package.json`'
+run = 'node --run dev'
+depends = ['pnpm-install']
+
+[tasks.check-balance]
+description = 'Check OpenRouter balance and post to Slack'
+run = 'node scripts/check-balance.mjs'
+depends = ['pnpm-install']
+
+[tasks.check-balance-dry]
+description = 'Check OpenRouter balance without posting to Slack (dry run)'
+run = 'SLACK_WEBHOOK_URL="" node scripts/check-balance.mjs'
+depends = ['pnpm-install']
+
+[tasks.test]
+description = 'Run the usage monitor locally for testing'
+run = 'node scripts/check-balance.mjs'
+depends = ['pnpm-install']
