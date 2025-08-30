@@ -1,0 +1,5 @@
+- always use pnpm
+- prefer typescript
+- test using tsx rather than pnpm build
+- always use vitest for testing
+- test should be next to the file tested with .test intead of a seperate test directory

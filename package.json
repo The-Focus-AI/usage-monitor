@@ -8,9 +8,23 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "check": "node scripts/check-balance.mjs"
+    "build": "tsc",
+    "dev": "tsx src/cli/main.ts",
+    "check": "tsx src/cli/main.ts",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "legacy": "node scripts/check-balance.mjs"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "zod": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "@vitest/ui": "^3.2.4",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
   }
 }
