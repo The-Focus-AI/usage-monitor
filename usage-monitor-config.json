@@ -1,0 +1,17 @@
+{
+  "services": {
+    "openrouter": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/OpenRouter Key/notesPlain",
+      "fallbackEnvVar": "OPENROUTER_API_KEY",
+      "description": "OpenRouter - $20.47 remaining",
+      "lastValidated": "2025-08-31T19:26:40.974Z",
+      "thresholds": {},
+      "vault": "Development",
+      "itemTitle": "OpenRouter Key"
+    }
+  },
+  "notifications": {},
+  "lastUpdated": "2025-08-31T19:26:40.976Z"
+}

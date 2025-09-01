@@ -6,6 +6,7 @@ import { OpenRouterProvider } from '../providers/openrouter.js';
 import { SlackNotifier } from '../notifications/slack.js';
 import { formatUsd, getCurrentUtc, shouldSendDaily } from '../shared/utils.js';
 import { configLoader } from '../config/loader.js';
+import { ConfigManager } from '../config/manager.js';
 import type { NotificationField } from '../shared/types.js';
 
 // Load environment variables from .env file
@@ -15,17 +16,50 @@ loadEnv();
 
 async function main(): Promise<void> {
   try {
-    // Load configuration
-    const config = await configLoader.load();
+    // Try the new config manager first, fall back to old config loader
+    let openrouterApiKey: string;
+    let slackWebhookUrl: string | undefined;
+    let thresholdUsd: number;
+    let dailyPostHour: number;
+
+    const configManager = new ConfigManager();
     
-    // Check if OpenRouter is configured
-    if (!config.providers.openrouter?.enabled) {
-      console.error('OpenRouter provider not configured or disabled');
-      process.exit(2);
+    try {
+      // Try new config system
+      const services = await configManager.listServices();
+      
+      if (services.openrouter?.enabled) {
+        console.log('Using new configuration system...');
+        openrouterApiKey = await configManager.getCredential('openrouter');
+        
+        // TODO: Get notification config from new system
+        thresholdUsd = services.openrouter.thresholds?.warning || 10;
+        dailyPostHour = 16; // Default for now
+        slackWebhookUrl = process.env.SLACK_WEBHOOK_URL; // Fallback to env
+      } else {
+        throw new Error('OpenRouter not configured in new system');
+      }
+    } catch {
+      // Fall back to old configuration system
+      console.log('Falling back to legacy configuration system...');
+      const config = await configLoader.load();
+      
+      if (!config.providers.openrouter?.enabled) {
+        console.error('OpenRouter provider not configured or disabled');
+        process.exit(2);
+      }
+      
+      openrouterApiKey = config.providers.openrouter.apiKey;
+      thresholdUsd = config.thresholds.alertThresholdUsd;
+      dailyPostHour = config.thresholds.dailyPostUtcHour;
+      slackWebhookUrl = config.notifications.slack?.webhookUrl;
     }
 
     // Initialize provider
-    const provider = new OpenRouterProvider(config.providers.openrouter);
+    const provider = new OpenRouterProvider({ 
+      apiKey: openrouterApiKey, 
+      enabled: true 
+    });
 
     // Test authentication
     const isAuthenticated = await provider.authenticate();
@@ -38,7 +72,7 @@ async function main(): Promise<void> {
     const usage = await provider.getUsage();
     const { hour } = getCurrentUtc();
 
-    const underThreshold = usage.remainingBalance < config.thresholds.alertThresholdUsd;
+    const underThreshold = usage.remainingBalance < thresholdUsd;
 
     let shouldNotify = false;
     let cadence = 'daily';
@@ -50,7 +84,7 @@ async function main(): Promise<void> {
     } else {
       // Post once a day at configured hour
       cadence = 'daily';
-      if (shouldSendDaily(hour, config.thresholds.dailyPostUtcHour)) {
+      if (shouldSendDaily(hour, dailyPostHour)) {
         shouldNotify = true;
       }
     }
@@ -59,7 +93,7 @@ async function main(): Promise<void> {
       { title: 'Credits Purchased', value: formatUsd(usage.totalCredits) },
       { title: 'Credits Used', value: formatUsd(usage.totalUsage) },
       { title: 'Balance Remaining', value: formatUsd(usage.remainingBalance) },
-      { title: 'Threshold', value: formatUsd(config.thresholds.alertThresholdUsd) },
+      { title: 'Threshold', value: formatUsd(thresholdUsd) },
       { title: 'Cadence', value: cadence },
     ];
 
@@ -68,14 +102,14 @@ async function main(): Promise<void> {
       : `:money_with_wings: OpenRouter balance: ${formatUsd(usage.remainingBalance)} remaining`;
 
     // Check if we have Slack notifications configured
-    const isDryRun = !config.notifications.slack?.enabled || !config.notifications.slack?.webhookUrl;
+    const isDryRun = !slackWebhookUrl;
 
     if (shouldNotify) {
       if (isDryRun) {
         console.log('dry-run: would notify with message:', text);
         console.log('dry-run: fields:', fields);
       } else {
-        const slackNotifier = new SlackNotifier({ webhookUrl: config.notifications.slack.webhookUrl });
+        const slackNotifier = new SlackNotifier({ webhookUrl: slackWebhookUrl });
         await slackNotifier.send({ text, fields });
         console.log('notified');
       }
@@ -90,7 +124,7 @@ async function main(): Promise<void> {
         purchased: usage.totalCredits,
         used: usage.totalUsage,
         remaining: usage.remainingBalance,
-        threshold: config.thresholds.alertThresholdUsd,
+        threshold: thresholdUsd,
         cadence,
         notified: shouldNotify && !isDryRun,
         dryRun: isDryRun,

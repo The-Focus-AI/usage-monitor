@@ -1,0 +1,59 @@
+{
+  "services": {
+    "openrouter": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/OpenRouter Key/additional_information",
+      "fallbackEnvVar": "OPENROUTER_API_KEY",
+      "description": "OpenRouter - $20.48 remaining",
+      "lastValidated": "2025-08-31T10:25:00Z",
+      "thresholds": {
+        "warning": 10,
+        "critical": 5
+      },
+      "vault": "Development",
+      "itemTitle": "OpenRouter Key"
+    },
+    "openai": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/OpenAI Key/additional_information",
+      "fallbackEnvVar": "OPENAI_API_KEY",
+      "description": "OpenAI Plus - $15.32 remaining",
+      "lastValidated": "2025-08-31T10:25:00Z",
+      "thresholds": {
+        "warning": 15,
+        "critical": 5
+      },
+      "vault": "Development", 
+      "itemTitle": "OpenAI Key"
+    },
+    "claude": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/Claude API/additional_information",
+      "fallbackEnvVar": "CLAUDE_API_KEY",
+      "description": "Claude Pro Plan - $20 credits remaining",
+      "lastValidated": "2025-08-31T10:25:00Z",
+      "thresholds": {
+        "warning": 10,
+        "critical": 3
+      },
+      "vault": "Development",
+      "itemTitle": "Claude API"
+    }
+  },
+  "notifications": {
+    "slack": {
+      "enabled": true,
+      "credentialSource": "env",
+      "fallbackEnvVar": "SLACK_WEBHOOK_URL"
+    },
+    "discord": {
+      "enabled": false,
+      "credentialSource": "env",
+      "fallbackEnvVar": "DISCORD_WEBHOOK_URL"
+    }
+  },
+  "lastUpdated": "2025-08-31T10:25:00Z"
+}
