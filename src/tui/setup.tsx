@@ -7,6 +7,13 @@ import { OnePasswordClient, type OnePasswordVault, type OnePasswordItem } from '
 import { isPotentialApiKey, guessServiceType, KNOWN_SERVICES, type ServiceType } from '../config/services.js';
 import { ConfigManager } from '../config/manager.js';
 import { OpenRouterProvider } from '../providers/openrouter.js';
+import { GoogleAIStudioProvider } from '../providers/google.js';
+import { MistralProvider } from '../providers/mistral.js';
+import { GroqProvider } from '../providers/groq.js';
+import { PerplexityProvider } from '../providers/perplexity.js';
+import { OpenAIProvider } from '../providers/openai.js';
+import { ClaudeProvider } from '../providers/claude.js';
+import { GrokProvider } from '../providers/grok.js';
 
 interface AppState {
   stage: 'checking' | 'loading-all-keys' | 'key-selection' | 'service-selection' | 'api-testing' | 'complete';
@@ -169,62 +176,97 @@ function SetupApp() {
       }
       
       // Test the API connection based on selected service type
-      if (state.selectedServiceType === 'openrouter') {
-        const provider = new OpenRouterProvider({ apiKey, enabled: true });
+      let provider: any = null;
+      let description = `${KNOWN_SERVICES[state.selectedServiceType].name} - Configured but not tested`;
+      
+      switch (state.selectedServiceType) {
+        case 'openrouter':
+          provider = new OpenRouterProvider({ apiKey, enabled: true });
+          break;
+        case 'google':
+          provider = new GoogleAIStudioProvider({ apiKey, enabled: true });
+          break;
+        case 'mistral':
+          provider = new MistralProvider({ apiKey, enabled: true });
+          break;
+        case 'groq':
+          provider = new GroqProvider({ apiKey, enabled: true });
+          break;
+        case 'perplexity':
+          provider = new PerplexityProvider({ apiKey, enabled: true });
+          break;
+        case 'openai':
+          provider = new OpenAIProvider({ apiKey, enabled: true });
+          break;
+        case 'claude':
+          provider = new ClaudeProvider({ apiKey, enabled: true });
+          break;
+        case 'grok':
+          provider = new GrokProvider({ apiKey, enabled: true });
+          break;
+        default:
+          // For service types without implemented providers, just save config
+          break;
+      }
+      
+      if (provider) {
         const isAuth = await provider.authenticate();
         
         if (isAuth) {
           const usage = await provider.getUsage();
           
-          // Save to config with the correct field name
-          const onePasswordRef = opClient.createReference(
-            state.selectedItem.vault.name,
-            state.selectedItem.title,
-            fieldName
-          );
-          
-          await state.configManager.addService('openrouter', {
-            credentialSource: '1password',
-            onePasswordRef,
-            fallbackEnvVar: 'OPENROUTER_API_KEY',
-            description: `OpenRouter - $${usage.remainingBalance.toFixed(2)} remaining`,
-            lastValidated: new Date().toISOString(),
-            vault: state.selectedItem.vault.name,
-            itemTitle: state.selectedItem.title,
-          });
-          
-          setState(prev => ({
-            ...prev,
-            stage: 'complete',
-            error: undefined as undefined,
-          }));
+          // Create service-specific descriptions
+          if (state.selectedServiceType === 'openrouter') {
+            description = `OpenRouter - $${usage.remainingBalance.toFixed(2)} remaining`;
+          } else if (state.selectedServiceType === 'google') {
+            const details = usage.usageDetails as any;
+            description = `Google AI Studio - ${details?.availableModels || 0} models available`;
+          } else if (state.selectedServiceType === 'mistral') {
+            const details = usage.usageDetails as any;
+            description = `Mistral AI - ${details?.availableModels || 0} models available`;
+          } else if (state.selectedServiceType === 'groq') {
+            const details = usage.usageDetails as any;
+            description = `Groq - ${details?.availableModels || 0} active models`;
+          } else if (state.selectedServiceType === 'perplexity') {
+            const details = usage.usageDetails as any;
+            description = `Perplexity AI - ${details?.availableModels || 0} models, search-enabled`;
+          } else if (state.selectedServiceType === 'openai') {
+            const details = usage.usageDetails as any;
+            description = `OpenAI - ${details?.availableModels || 0} models, $${details?.monthlySpend?.toFixed(2) || '0.00'} this month`;
+          } else if (state.selectedServiceType === 'claude') {
+            const details = usage.usageDetails as any;
+            description = `Claude - ${details?.availableModels || 0} models available`;
+          } else if (state.selectedServiceType === 'grok') {
+            const details = usage.usageDetails as any;
+            description = `Grok - ${details?.availableModels || 0} models, $${usage.remainingBalance?.toFixed(2) || '25.00'} credits`;
+          }
         } else {
           throw new Error('Authentication failed');
         }
-      } else {
-        // For other service types, just save the configuration without testing
-        const onePasswordRef = opClient.createReference(
-          state.selectedItem.vault.name,
-          state.selectedItem.title,
-          fieldName
-        );
-        
-        await state.configManager.addService(state.selectedServiceType, {
-          credentialSource: '1password',
-          onePasswordRef,
-          fallbackEnvVar: KNOWN_SERVICES[state.selectedServiceType].fallbackEnvVar,
-          description: `${KNOWN_SERVICES[state.selectedServiceType].name} - Configured but not tested`,
-          lastValidated: new Date().toISOString(),
-          vault: state.selectedItem.vault.name,
-          itemTitle: state.selectedItem.title,
-        });
-        
-        setState(prev => ({
-          ...prev,
-          stage: 'complete',
-          error: undefined as undefined,
-        }));
       }
+      
+      // Save to config with the correct field name
+      const onePasswordRef = opClient.createReference(
+        state.selectedItem.vault.name,
+        state.selectedItem.title,
+        fieldName
+      );
+      
+      await state.configManager.addService(state.selectedServiceType, {
+        credentialSource: '1password',
+        onePasswordRef,
+        fallbackEnvVar: KNOWN_SERVICES[state.selectedServiceType].fallbackEnvVar,
+        description,
+        lastValidated: new Date().toISOString(),
+        vault: state.selectedItem.vault.name,
+        itemTitle: state.selectedItem.title,
+      });
+      
+      setState(prev => ({
+        ...prev,
+        stage: 'complete',
+        error: undefined as undefined,
+      }));
       
     } catch (error) {
       setState(prev => ({

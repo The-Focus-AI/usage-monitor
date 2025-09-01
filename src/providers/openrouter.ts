@@ -1,4 +1,4 @@
-import { APIProvider, type UsageData, type BillingData } from '../shared/types.js';
+import { BaseAPIProvider, type UsageData, type BillingData } from '../shared/types.js';
 
 interface OpenRouterCreditsResponse {
   data: {
@@ -17,7 +17,7 @@ interface OpenRouterKeyResponse {
   };
 }
 
-export class OpenRouterProvider extends APIProvider {
+export class OpenRouterProvider extends BaseAPIProvider {
   readonly name = 'openrouter';
   private readonly baseUrl = 'https://openrouter.ai/api/v1';
 
@@ -45,9 +45,23 @@ export class OpenRouterProvider extends APIProvider {
       : Math.max(totalCredits - totalUsage, 0);
 
     return {
+      provider: 'openrouter',
+      totalTokens: totalUsage, // For consistency with new interface
+      totalCost: totalUsage,
+      remainingBalance,
+      usageDetails: {
+        totalCredits,
+        totalUsage,
+        currency: 'USD',
+      },
+      billingPeriod: {
+        start: new Date().toISOString(),
+        end: new Date().toISOString(),
+      },
+      lastUpdated: new Date().toISOString(),
+      // Legacy fields for backward compatibility
       totalCredits,
       totalUsage,
-      remainingBalance,
       currency: 'USD',
     };
   }
@@ -55,10 +69,46 @@ export class OpenRouterProvider extends APIProvider {
   async getBilling(): Promise<BillingData> {
     const keyData = await this.getKeyInfo();
     return {
+      provider: 'openrouter',
+      currentBalance: keyData?.limit_remaining || 0,
+      monthlySpend: (keyData?.usage || 0),
+      billingMethod: 'OpenRouter Credits',
+      nextBillingDate: null,
+      usageLimits: {
+        daily: null,
+        monthly: keyData?.limit || null,
+        note: keyData?.is_free_tier ? 'Free tier account' : 'Paid account',
+      },
+      lastUpdated: new Date().toISOString(),
+      // Legacy fields for backward compatibility
       limit: keyData?.limit,
       limitRemaining: keyData?.limit_remaining,
       isFreeTeir: keyData?.is_free_tier,
     };
+  }
+
+  protected formatUsageForNotification(usage: UsageData): string {
+    const details = usage.usageDetails as any;
+    return [
+      `💰 **OpenRouter Balance Status**`,
+      `💳 Credits Purchased: $${details?.totalCredits?.toFixed(2) || '0.00'}`,
+      `📊 Credits Used: $${details?.totalUsage?.toFixed(2) || '0.00'}`,
+      `💰 Balance Remaining: $${usage.remainingBalance.toFixed(2)}`,
+      '',
+      `🕒 Last checked: ${new Date(usage.lastUpdated).toLocaleString()}`,
+    ].join('\n');
+  }
+
+  getStatusEmoji(usage: UsageData): string {
+    const balance = usage.remainingBalance;
+    
+    if (balance < 5) return '🔴';   // Low balance
+    if (balance < 15) return '🟡';  // Moderate balance
+    return '🟢'; // Good balance
+  }
+
+  getQuickStatus(usage: UsageData): string {
+    return `$${usage.remainingBalance.toFixed(2)} remaining`;
   }
 
   private async getCredits(): Promise<OpenRouterCreditsResponse['data']> {

@@ -1,14 +1,42 @@
 export interface UsageData {
-  totalCredits: number;
-  totalUsage: number;
+  provider: string;
+  totalTokens: number;
+  totalCost: number;
   remainingBalance: number;
-  currency: string;
+  usageDetails?: Record<string, any>;
+  billingPeriod: {
+    start: string;
+    end: string;
+  };
+  lastUpdated: string;
+  // Legacy fields for backward compatibility
+  totalCredits?: number;
+  totalUsage?: number;
+  currency?: string;
 }
 
 export interface BillingData {
+  provider: string;
+  currentBalance: number;
+  monthlySpend: number;
+  billingMethod: string;
+  nextBillingDate: string | null;
+  usageLimits: {
+    daily: number | null;
+    monthly: number | null;
+    note?: string;
+  };
+  lastUpdated: string;
+  // Legacy fields for backward compatibility
   limit?: number;
   limitRemaining?: number;
   isFreeTeir?: boolean;
+}
+
+export interface ProviderConfig {
+  apiKey: string;
+  baseUrl?: string;
+  enabled: boolean;
 }
 
 export interface NotificationField {
@@ -16,17 +44,25 @@ export interface NotificationField {
   value: string;
 }
 
-export abstract class APIProvider {
-  abstract readonly name: string;
-  protected config: { apiKey: string; baseUrl?: string; enabled: boolean };
+// Re-export for convenience
+export type { ProviderConfig, UsageData, BillingData };
 
-  constructor(config: { apiKey: string; baseUrl?: string; enabled: boolean }) {
+export abstract class BaseAPIProvider {
+  abstract readonly name: string;
+  protected config: ProviderConfig;
+
+  constructor(config: ProviderConfig) {
     this.config = config;
   }
 
   abstract authenticate(): Promise<boolean>;
   abstract getUsage(): Promise<UsageData>;
-  abstract getBilling?(): Promise<BillingData>;
+  abstract getBilling?(): Promise<BillingData | null>;
+
+  // Abstract methods for notification formatting
+  protected abstract formatUsageForNotification(usage: UsageData): string;
+  abstract getStatusEmoji(usage: UsageData): string;
+  abstract getQuickStatus(usage: UsageData): string;
 
   protected async fetchJson<T>(
     url: string, 
@@ -53,3 +89,6 @@ export abstract class APIProvider {
     throw new Error('Unexpected error in fetchJson');
   }
 }
+
+// Legacy class for backward compatibility
+export abstract class APIProvider extends BaseAPIProvider {}

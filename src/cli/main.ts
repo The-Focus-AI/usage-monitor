@@ -3,6 +3,14 @@
 import process from 'node:process';
 import { config as loadEnv } from 'dotenv';
 import { OpenRouterProvider } from '../providers/openrouter.js';
+import { GoogleAIStudioProvider } from '../providers/google.js';
+import { MistralProvider } from '../providers/mistral.js';
+import { GroqProvider } from '../providers/groq.js';
+import { PerplexityProvider } from '../providers/perplexity.js';
+import { OpenAIProvider } from '../providers/openai.js';
+import { ClaudeProvider } from '../providers/claude.js';
+import { GrokProvider } from '../providers/grok.js';
+import type { BaseAPIProvider } from '../shared/types.js';
 import { SlackNotifier } from '../notifications/slack.js';
 import { formatUsd, getCurrentUtc, shouldSendDaily } from '../shared/utils.js';
 import { configLoader } from '../config/loader.js';
@@ -14,71 +22,107 @@ loadEnv();
 
 // Configuration will be loaded from config file + environment variables
 
+// Create provider instances
+function createProvider(serviceType: string, apiKey: string): BaseAPIProvider {
+  switch (serviceType) {
+    case 'openrouter':
+      return new OpenRouterProvider({ apiKey, enabled: true });
+    case 'google':
+      return new GoogleAIStudioProvider({ apiKey, enabled: true });
+    case 'mistral':
+      return new MistralProvider({ apiKey, enabled: true });
+    case 'groq':
+      return new GroqProvider({ apiKey, enabled: true });
+    case 'perplexity':
+      return new PerplexityProvider({ apiKey, enabled: true });
+    case 'openai':
+      return new OpenAIProvider({ apiKey, enabled: true });
+    case 'claude':
+      return new ClaudeProvider({ apiKey, enabled: true });
+    case 'grok':
+      return new GrokProvider({ apiKey, enabled: true });
+    default:
+      throw new Error(`Unknown provider type: ${serviceType}`);
+  }
+}
+
 async function main(): Promise<void> {
   try {
-    // Try the new config manager first, fall back to old config loader
-    let openrouterApiKey: string;
-    let slackWebhookUrl: string | undefined;
-    let thresholdUsd: number;
-    let dailyPostHour: number;
-
     const configManager = new ConfigManager();
+    const services = await configManager.listServices();
     
-    try {
-      // Try new config system
-      const services = await configManager.listServices();
-      
-      if (services.openrouter?.enabled) {
-        console.log('Using new configuration system...');
-        openrouterApiKey = await configManager.getCredential('openrouter');
-        
-        // TODO: Get notification config from new system
-        thresholdUsd = services.openrouter.thresholds?.warning || 10;
-        dailyPostHour = 16; // Default for now
-        slackWebhookUrl = process.env.SLACK_WEBHOOK_URL; // Fallback to env
-      } else {
-        throw new Error('OpenRouter not configured in new system');
-      }
-    } catch {
-      // Fall back to old configuration system
-      console.log('Falling back to legacy configuration system...');
-      const config = await configLoader.load();
-      
-      if (!config.providers.openrouter?.enabled) {
-        console.error('OpenRouter provider not configured or disabled');
-        process.exit(2);
-      }
-      
-      openrouterApiKey = config.providers.openrouter.apiKey;
-      thresholdUsd = config.thresholds.alertThresholdUsd;
-      dailyPostHour = config.thresholds.dailyPostUtcHour;
-      slackWebhookUrl = config.notifications.slack?.webhookUrl;
+    // Get enabled services
+    const enabledServices = Object.entries(services).filter(([_, config]) => config.enabled);
+    
+    if (enabledServices.length === 0) {
+      console.error('No enabled services found in configuration');
+      process.exit(2);
     }
-
-    // Initialize provider
-    const provider = new OpenRouterProvider({ 
-      apiKey: openrouterApiKey, 
-      enabled: true 
-    });
-
-    // Test authentication
-    const isAuthenticated = await provider.authenticate();
-    if (!isAuthenticated) {
-      console.error('OpenRouter authentication failed');
-      process.exit(1);
-    }
-
-    // Get usage data
-    const usage = await provider.getUsage();
+    
+    console.log(`Monitoring ${enabledServices.length} enabled services...`);
+    
+    // Get notification config
+    let slackWebhookUrl: string | undefined = process.env.SLACK_WEBHOOK_URL;
+    const isDryRun = !slackWebhookUrl;
+    
+    // Monitor all enabled services in parallel
+    const results = await Promise.allSettled(
+      enabledServices.map(async ([serviceType, serviceConfig]) => {
+        try {
+          const apiKey = await configManager.getCredential(serviceType);
+          const provider = createProvider(serviceType, apiKey);
+          
+          // Test authentication
+          const isAuthenticated = await provider.authenticate();
+          if (!isAuthenticated) {
+            throw new Error(`${serviceType} authentication failed`);
+          }
+          
+          // Get usage data
+          const usage = await provider.getUsage();
+          const thresholdUsd = serviceConfig.thresholds?.warning || 10;
+          
+          return {
+            serviceType,
+            provider,
+            usage,
+            thresholdUsd,
+            status: 'success' as const,
+          };
+        } catch (error) {
+          console.error(`Error monitoring ${serviceType}:`, error);
+          return {
+            serviceType,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            status: 'error' as const,
+          };
+        }
+      })
+    );
+    
+    // Process results
+    const successfulResults = results
+      .filter((result): result is PromiseFulfilledResult<any> => result.status === 'fulfilled')
+      .map(result => result.value)
+      .filter(result => result.status === 'success');
+    
     const { hour } = getCurrentUtc();
-
-    const underThreshold = usage.remainingBalance < thresholdUsd;
-
+    const dailyPostHour = 16; // Default daily posting hour
+    
+    // Check if any service needs notification
+    const criticalServices = successfulResults.filter(result => {
+      if (result.serviceType === 'openrouter' || result.serviceType === 'grok') {
+        return result.usage.remainingBalance < result.thresholdUsd;
+      }
+      // For other services, use different criteria or skip notifications
+      return false;
+    });
+    
     let shouldNotify = false;
     let cadence = 'daily';
-
-    if (underThreshold) {
-      // Post hourly when under threshold
+    
+    if (criticalServices.length > 0) {
+      // Post hourly when any service is under threshold
       cadence = 'hourly';
       shouldNotify = true;
     } else {
@@ -89,20 +133,38 @@ async function main(): Promise<void> {
       }
     }
 
-    const fields: NotificationField[] = [
-      { title: 'Credits Purchased', value: formatUsd(usage.totalCredits) },
-      { title: 'Credits Used', value: formatUsd(usage.totalUsage) },
-      { title: 'Balance Remaining', value: formatUsd(usage.remainingBalance) },
-      { title: 'Threshold', value: formatUsd(thresholdUsd) },
+    // Create notification message
+    let text = '';
+    const fields: NotificationField[] = [];
+    
+    if (criticalServices.length > 0) {
+      const criticalNames = criticalServices.map(s => s.serviceType).join(', ');
+      text = `:rotating_light: ${criticalServices.length} service(s) need attention: ${criticalNames}`;
+      
+      criticalServices.forEach(result => {
+        const balance = result.usage.remainingBalance;
+        fields.push({
+          title: `${result.serviceType} Balance`,
+          value: formatUsd(balance)
+        });
+      });
+    } else {
+      text = `:white_check_mark: All ${successfulResults.length} services are healthy`;
+      
+      successfulResults.forEach(result => {
+        const status = result.provider.getQuickStatus(result.usage);
+        fields.push({
+          title: result.serviceType,
+          value: status
+        });
+      });
+    }
+    
+    fields.push(
+      { title: 'Services Monitored', value: successfulResults.length.toString() },
       { title: 'Cadence', value: cadence },
-    ];
-
-    const text = underThreshold
-      ? `:rotating_light: OpenRouter balance low: ${formatUsd(usage.remainingBalance)} remaining`
-      : `:money_with_wings: OpenRouter balance: ${formatUsd(usage.remainingBalance)} remaining`;
-
-    // Check if we have Slack notifications configured
-    const isDryRun = !slackWebhookUrl;
+      { title: 'Last Check', value: new Date().toLocaleString() }
+    );
 
     if (shouldNotify) {
       if (isDryRun) {
@@ -117,22 +179,51 @@ async function main(): Promise<void> {
       console.log('no-notify');
     }
 
-    // Also emit a JSON line for logs/consumers
-    console.log(
-      JSON.stringify({
-        provider: provider.name,
-        purchased: usage.totalCredits,
-        used: usage.totalUsage,
-        remaining: usage.remainingBalance,
-        threshold: thresholdUsd,
-        cadence,
-        notified: shouldNotify && !isDryRun,
-        dryRun: isDryRun,
-        wouldNotify: shouldNotify,
-      })
-    );
+    // Emit JSON log for each service
+    successfulResults.forEach(result => {
+      console.log(
+        JSON.stringify({
+          provider: result.provider.name,
+          status: 'success',
+          remaining: result.usage.remainingBalance,
+          threshold: result.thresholdUsd,
+          cadence,
+          notified: shouldNotify && !isDryRun,
+          dryRun: isDryRun,
+          wouldNotify: shouldNotify,
+          quickStatus: result.provider.getQuickStatus(result.usage),
+        })
+      );
+    });
+    
+    // Log errors
+    results.forEach(result => {
+      if (result.status === 'rejected' || (result.status === 'fulfilled' && result.value.status === 'error')) {
+        const errorResult = result.status === 'rejected' ? 
+          { serviceType: 'unknown', error: result.reason } : 
+          result.value;
+        
+        console.log(
+          JSON.stringify({
+            provider: errorResult.serviceType,
+            status: 'error',
+            error: errorResult.error,
+            cadence,
+            notified: false,
+            dryRun: isDryRun,
+          })
+        );
+      }
+    });
   } catch (error) {
     console.error('Configuration or runtime error:', error);
+    console.log(
+      JSON.stringify({
+        status: 'fatal_error',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
+    );
     process.exit(1);
   }
 }

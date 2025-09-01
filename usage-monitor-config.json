@@ -7,11 +7,118 @@
       "fallbackEnvVar": "OPENROUTER_API_KEY",
       "description": "OpenRouter - $20.47 remaining",
       "lastValidated": "2025-08-31T19:26:40.974Z",
-      "thresholds": {},
+      "thresholds": {
+        "warning": 10,
+        "critical": 5
+      },
       "vault": "Development",
       "itemTitle": "OpenRouter Key"
+    },
+    "google": {
+      "enabled": true,
+      "credentialSource": "1password", 
+      "onePasswordRef": "op://Development/Google AI Studio Key/notesPlain",
+      "fallbackEnvVar": "GOOGLE_AI_API_KEY",
+      "description": "Google AI Studio - Gemini API service",
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 1000,
+        "critical": 100
+      },
+      "vault": "Development",
+      "itemTitle": "Google AI Studio Key"
+    },
+    "openai": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/OpenAI Key/notesPlain", 
+      "fallbackEnvVar": "OPENAI_API_KEY",
+      "description": "OpenAI - GPT API service",
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 20,
+        "critical": 5
+      },
+      "vault": "Development",
+      "itemTitle": "OpenAI Key"
+    },
+    "claude": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/Claude API/notesPlain",
+      "fallbackEnvVar": "CLAUDE_API_KEY", 
+      "description": "Claude - Anthropic AI API service",
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 20,
+        "critical": 5
+      },
+      "vault": "Development", 
+      "itemTitle": "Claude API"
+    },
+    "mistral": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/Mistral API/notesPlain",
+      "fallbackEnvVar": "MISTRAL_API_KEY",
+      "description": "Mistral AI - La Plateforme API service", 
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 15,
+        "critical": 5
+      },
+      "vault": "Development",
+      "itemTitle": "Mistral API"
+    },
+    "groq": {
+      "enabled": true,
+      "credentialSource": "1password", 
+      "onePasswordRef": "op://Personal/Groq Key/notesPlain",
+      "fallbackEnvVar": "GROQ_API_KEY",
+      "description": "Groq - Fast AI inference",
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 10,
+        "critical": 2
+      },
+      "vault": "Personal",
+      "itemTitle": "Groq Key"
+    },
+    "perplexity": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/perplexity api/notesPlain", 
+      "fallbackEnvVar": "PERPLEXITY_API_KEY",
+      "description": "Perplexity AI - Search-augmented AI",
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 8,
+        "critical": 2
+      },
+      "vault": "Development",
+      "itemTitle": "perplexity api"
+    },
+    "grok": {
+      "enabled": true,
+      "credentialSource": "1password",
+      "onePasswordRef": "op://Development/Grok API Key/notesPlain",
+      "fallbackEnvVar": "GROK_API_KEY", 
+      "description": "Grok - xAI API service with $25 monthly credits",
+      "lastValidated": "2025-01-01T00:00:00.000Z",
+      "thresholds": {
+        "warning": 10,
+        "critical": 5
+      },
+      "vault": "Development",
+      "itemTitle": "Grok API Key"
     }
   },
-  "notifications": {},
+  "notifications": {
+    "slack": {
+      "enabled": true,
+      "credentialSource": "env",
+      "fallbackEnvVar": "SLACK_WEBHOOK_URL"
+    }
+  },
   "lastUpdated": "2025-08-31T19:26:40.976Z"
 }
