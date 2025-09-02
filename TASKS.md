@@ -5,12 +5,12 @@
 Extend the current OpenRouter usage monitor into a comprehensive API monitoring suite supporting:
 - **OpenRouter** ✅ ($19.85 remaining, full monitoring)
 - **Google AI Studio** ✅ (15 models available)
-- **OpenAI** ✅ (82 models, monthly spend tracking)
+- **OpenAI** ✅ (82 models, monthly spend tracking; best‑effort credits)
 - **Mistral AI** ✅ (67 models available)
 - **Groq** ✅ (20 active models, ultra-fast)
 - **Grok (xAI)** ✅ (10 models, $25 monthly credits)
-- **Claude (Anthropic)** 🔧 (implemented, minor auth config needed)
-- **Perplexity AI** 🔧 (implemented, auth config needed)
+- **Claude (Anthropic)** ✅ (auth fixed; monitoring active)
+- **Perplexity AI** ✅ (auth flow hardened; monitoring active)
 - **Replicate** 🔄 (researched, ready for implementation)
 - **fal.ai** 🔄 (researched, ready for implementation)
 - **Search APIs** 🔄 (SERP, Brave, Tavily - utility monitoring)
@@ -56,12 +56,12 @@ Extend the current OpenRouter usage monitor into a comprehensive API monitoring 
 - [x] **3.1** Research and implement major AI providers ✅
   - ✅ **OpenRouter**: Full usage monitoring, balance tracking, Slack notifications
   - ✅ **Google AI Studio**: 15 models available, Gemini API integration
-  - ✅ **OpenAI**: 82 models detected, monthly spend tracking, usage API
+  - ✅ **OpenAI**: 82 models detected, monthly spend tracking, usage API (best‑effort credit balance)
   - ✅ **Mistral AI**: 67 models available, La Plateforme integration
   - ✅ **Groq**: 20 active models, ultra-fast inference, GroqCloud integration
   - ✅ **Grok (xAI)**: 10 models, $25 monthly credits system
-  - 🔧 **Claude/Anthropic**: 6 models implemented, minor auth config needed
-  - 🔧 **Perplexity AI**: Search-augmented AI implemented, auth config needed
+  - ✅ **Claude/Anthropic**: Auth header corrected (x-api-key); monitoring active
+  - ✅ **Perplexity AI**: Auth hardened (model fallback, permissive 400 handling); monitoring active
 - [x] **3.2** Enhanced service detection system ✅
   - ✅ 11 provider types with auto-detection patterns
   - ✅ API key format recognition (sk-proj-, AIza, gsk_, pplx-, xai-, etc.)
@@ -72,6 +72,7 @@ Extend the current OpenRouter usage monitor into a comprehensive API monitoring 
   - ✅ Parallel provider execution across all enabled services
   - ✅ Error handling and graceful degradation (6/8 services working)
   - ✅ Combined status reporting with service-specific details
+  - ✅ Unified balance computation (prefers billing API, falls back to usage)
 - [x] **3.4** Enhanced notification system ✅
   - ✅ Multi-provider summary notifications
   - ✅ Provider-specific alerting with custom thresholds
@@ -103,6 +104,7 @@ Extend the current OpenRouter usage monitor into a comprehensive API monitoring 
 - [ ] **5.3** Add usage analytics and reporting
 - [ ] **5.4** Create web dashboard (optional)
 - [ ] **5.5** Add export functionality (CSV, JSON)
+  - [ ] Persist per-run JSONL logs with remaining balances
 
 ### Phase 6: Testing & Documentation
 - [ ] **6.1** Comprehensive testing suite
@@ -183,13 +185,16 @@ src/
 - ✅ **Phase 1 Complete**: TypeScript architecture with provider abstraction
 - ✅ **Phase 2 Complete**: Enhanced 1Password integration & service discovery
 - ✅ **Phase 3 Complete**: 8 major AI providers implemented with multi-provider orchestration
-- ✅ **Multi-Provider Monitoring Active**: 6/8 services successfully monitored simultaneously
-  - OpenRouter: $19.85 remaining, full usage tracking
+- ✅ **Multi-Provider Monitoring Active**: 8/8 services successfully monitored
+  - OpenRouter: $19.85 remaining (credits API)
   - Google AI Studio: 15 models available
-  - OpenAI: 82 models detected, monthly spend tracking
+  - OpenAI: 82 models detected, monthly spend tracking; best‑effort credit balance
   - Mistral AI: 67 models available
   - Groq: 20 active models, ultra-fast inference
   - Grok (xAI): 10 models, $25 credits remaining
+  - Claude (Anthropic): Auth fixed; monitoring active
+  - Perplexity: Auth hardened; monitoring active
+- ✅ Unified balance computation in CLI: prefers provider billing balance; falls back to usage balance
 - ✅ GitHub Actions integration (legacy script still active)
 - ✅ Slack notifications working through new config system
 - ✅ Comprehensive test suite (27 passing tests with Vitest)

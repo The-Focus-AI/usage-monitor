@@ -80,12 +80,38 @@ async function main(): Promise<void> {
           
           // Get usage data
           const usage = await provider.getUsage();
+          // Try to fetch billing (for real balance when supported)
+          let billingBalance: number | null = null;
+          let balanceSource: 'billing' | 'usage' | 'unknown' = 'unknown';
+          try {
+            if (typeof provider.getBilling === 'function') {
+              const billing = await provider.getBilling?.();
+              if (billing && Number.isFinite(billing.currentBalance)) {
+                billingBalance = billing.currentBalance;
+                balanceSource = 'billing';
+              }
+            }
+          } catch {
+            // ignore billing errors and fall back to usage
+          }
+          // Fallback to usage remainingBalance when billing not available
+          // Prefer a positive billing balance; otherwise fall back to usage-derived value
+          let balance = 0;
+          if (billingBalance !== null && billingBalance > 0) {
+            balance = billingBalance;
+            balanceSource = 'billing';
+          } else {
+            balance = Number.isFinite(usage.remainingBalance) ? usage.remainingBalance : 0;
+            balanceSource = 'usage';
+          }
           const thresholdUsd = serviceConfig.thresholds?.warning || 10;
           
           return {
             serviceType,
             provider,
             usage,
+            balance,
+            balanceSource,
             thresholdUsd,
             status: 'success' as const,
           };
@@ -112,7 +138,9 @@ async function main(): Promise<void> {
     // Check if any service needs notification
     const criticalServices = successfulResults.filter(result => {
       if (result.serviceType === 'openrouter' || result.serviceType === 'grok') {
-        return result.usage.remainingBalance < result.thresholdUsd;
+        // Use computed balance when available
+        const remaining = Number.isFinite(result.balance) ? result.balance : result.usage.remainingBalance;
+        return remaining < result.thresholdUsd;
       }
       // For other services, use different criteria or skip notifications
       return false;
@@ -181,11 +209,13 @@ async function main(): Promise<void> {
 
     // Emit JSON log for each service
     successfulResults.forEach(result => {
+      const remaining = Number.isFinite(result.balance) ? result.balance : result.usage.remainingBalance;
       console.log(
         JSON.stringify({
           provider: result.provider.name,
           status: 'success',
-          remaining: result.usage.remainingBalance,
+          remaining,
+          balanceSource: result.balanceSource,
           threshold: result.thresholdUsd,
           cadence,
           notified: shouldNotify && !isDryRun,

@@ -23,6 +23,13 @@ interface OpenAIUsageResponse {
   total_usage: number;
 }
 
+interface OpenAICreditGrantsResponse {
+  object: string;
+  total_granted: number;
+  total_used: number;
+  total_available: number;
+}
+
 export class OpenAIProvider extends BaseAPIProvider {
   readonly name = 'openai';
   private readonly baseUrl = 'https://api.openai.com/v1';
@@ -60,6 +67,24 @@ export class OpenAIProvider extends BaseAPIProvider {
 
   async getUsage(): Promise<UsageData> {
     try {
+      // Try to fetch legacy credit grants to estimate remaining credits
+      let remainingCredits = 0;
+      try {
+        const creditsRes = await fetch(`${this.baseUrl}/dashboard/billing/credit_grants`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${this.config.apiKey}`,
+            'Accept': 'application/json',
+          },
+        });
+        if (creditsRes.ok) {
+          const credits: OpenAICreditGrantsResponse = await creditsRes.json();
+          remainingCredits = credits?.total_available ?? 0;
+        }
+      } catch {
+        // ignore if not available
+      }
+
       // First get available models for context
       const modelsResponse = await fetch(`${this.baseUrl}/models`, {
         method: 'GET',
@@ -112,7 +137,7 @@ export class OpenAIProvider extends BaseAPIProvider {
         provider: 'openai',
         totalTokens: totalUsage,
         totalCost: monthlySpend,
-        remainingBalance: 0, // OpenAI doesn't show remaining balance in API
+        remainingBalance: remainingCredits || 0, // Best-effort via credit_grants
         usageDetails: {
           availableModels: ownedModels.length,
           totalModels: modelsData.data.length,
@@ -135,17 +160,57 @@ export class OpenAIProvider extends BaseAPIProvider {
   }
 
   async getBilling(): Promise<BillingData | null> {
-    // OpenAI billing is managed through the dashboard
+    // Best-effort: try legacy credit_grants + usage endpoints
+    let currentBalance = 0;
+    try {
+      const creditsRes = await fetch(`${this.baseUrl}/dashboard/billing/credit_grants`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Accept': 'application/json',
+        },
+      });
+      if (creditsRes.ok) {
+        const credits: OpenAICreditGrantsResponse = await creditsRes.json();
+        currentBalance = credits?.total_available ?? 0;
+      }
+    } catch {
+      // ignore
+    }
+
+    let monthlySpend = 0;
+    try {
+      const today = new Date();
+      const startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      const usageResponse = await fetch(
+        `${this.baseUrl}/dashboard/billing/usage?start_date=${startDate.toISOString().split('T')[0]}&end_date=${today.toISOString().split('T')[0]}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${this.config.apiKey}`,
+            'Accept': 'application/json',
+          },
+        }
+      );
+      if (usageResponse.ok) {
+        const usageData: OpenAIUsageResponse = await usageResponse.json();
+        monthlySpend = usageData.daily_costs?.reduce((sum, day) => 
+          sum + day.line_items.reduce((daySum, item) => daySum + item.cost, 0), 0) || 0;
+      }
+    } catch {
+      // ignore
+    }
+
     return {
       provider: 'openai',
-      currentBalance: 0,
-      monthlySpend: 0,
-      billingMethod: 'OpenAI Dashboard',
+      currentBalance,
+      monthlySpend,
+      billingMethod: 'OpenAI Dashboard (best-effort API)',
       nextBillingDate: null,
       usageLimits: {
         daily: null,
         monthly: null,
-        note: 'Rate limits and billing managed through platform.openai.com',
+        note: 'Credit grants endpoint may not be available for all accounts',
       },
       lastUpdated: new Date().toISOString(),
     };

@@ -32,7 +32,8 @@ export class ClaudeProvider extends BaseAPIProvider {
       const response = await fetch(`${this.baseUrl}/messages`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          // Anthropic uses x-api-key, not Authorization
+          'x-api-key': this.config.apiKey,
           'Content-Type': 'application/json',
           'anthropic-version': '2023-06-01',
           'Accept': 'application/json',

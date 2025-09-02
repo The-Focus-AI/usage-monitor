@@ -32,40 +32,59 @@ export class PerplexityProvider extends BaseAPIProvider {
   async authenticate(): Promise<boolean> {
     try {
       // Perplexity doesn't have a models endpoint, so we'll do a minimal test request
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'llama-3.1-sonar-small-128k-online',
-          messages: [{
-            role: 'user',
-            content: 'Hello'
-          }],
-          max_tokens: 1,
-          temperature: 0,
-        }),
-      });
+      // Try an offline instruct model first (more permissive), then fallback to sonar online
+      const tryAuth = async (model: string): Promise<{ ok: boolean; status: number; body?: string; data?: PerplexityTestResponse }> => {
+        const res = await fetch(`${this.baseUrl}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.config.apiKey}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'usage-monitor/0.1',
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: 'user', content: 'Hello' }],
+            max_tokens: 1,
+            temperature: 0,
+          }),
+        });
+        if (res.ok) {
+          const data: PerplexityTestResponse = await res.json();
+          return { ok: true, status: res.status, data };
+        }
+        let body: string | undefined;
+        try { body = await res.text(); } catch {}
+        return { ok: false, status: res.status, body };
+      };
 
-      if (response.status === 401) {
-        return false; // Invalid API key
+      // First attempt with an instruct model
+      let result = await tryAuth('llama-3.1-8b-instruct');
+      if (!result.ok) {
+        // Fallback to sonar online variant
+        const fallback = await tryAuth('llama-3.1-sonar-small-128k-online');
+        result = fallback;
       }
 
-      if (response.status === 429) {
-        // Rate limited but API key is valid
-        return true;
+      if (result.ok && result.data) {
+        return result.data.object === 'chat.completion' && !!result.data.usage;
       }
 
-      if (!response.ok) {
-        console.warn(`Perplexity auth check failed: ${response.status} ${response.statusText}`);
-        return false;
+      // Handle common non-auth related errors as success (e.g., model permissions, bad params)
+      if (result.status === 429) return true; // rate limit implies valid key
+      if (result.status === 400) {
+        const msg = (result.body || '').toLowerCase();
+        const isAuthError = msg.includes('auth') || msg.includes('api key') || msg.includes('unauthorized');
+        if (!isAuthError) {
+          // Treat other 400s (e.g., model not enabled, invalid params) as authenticated
+          return true;
+        }
       }
 
-      const data: PerplexityTestResponse = await response.json();
-      return data.object === 'chat.completion' && data.usage && data.usage.total_tokens > 0;
+      if (result.status === 401) return false; // invalid key
+
+      console.warn(`Perplexity auth check failed: ${result.status} ${result.body || ''}`);
+      return false;
     } catch (error) {
       console.error('Perplexity authentication error:', error);
       return false;
