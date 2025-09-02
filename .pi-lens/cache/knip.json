@@ -1,0 +1,626 @@
+{
+  "success": true,
+  "issues": [
+    {
+      "type": "file",
+      "name": "src/config/loader.ts",
+      "file": "src/config/loader.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/checker.ts",
+      "file": "src/server/checker.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/scheduler.ts",
+      "file": "src/server/scheduler.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/extensions/file-review/FileBrowser.ts",
+      "file": ".pi/extensions/file-review/FileBrowser.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/extensions/file-review/index.ts",
+      "file": ".pi/extensions/file-review/index.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-check-update.js",
+      "file": ".pi/gsd/hooks/gsd-check-update.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-context-monitor.js",
+      "file": ".pi/gsd/hooks/gsd-context-monitor.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-prompt-guard.js",
+      "file": ".pi/gsd/hooks/gsd-prompt-guard.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-statusline.js",
+      "file": ".pi/gsd/hooks/gsd-statusline.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-workflow-guard.js",
+      "file": ".pi/gsd/hooks/gsd-workflow-guard.js"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/vite.config.ts",
+      "file": "src/server/dashboard/vite.config.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/discord.ts",
+      "file": "src/server/notifications/discord.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/email.ts",
+      "file": "src/server/notifications/email.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/index.ts",
+      "file": "src/server/notifications/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/slack.ts",
+      "file": "src/server/notifications/slack.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/App.tsx",
+      "file": "src/server/dashboard/src/App.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/api.ts",
+      "file": "src/server/dashboard/src/api.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/main.tsx",
+      "file": "src/server/dashboard/src/main.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/components/AddKeyForm.tsx",
+      "file": "src/server/dashboard/src/components/AddKeyForm.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/components/KeyList.tsx",
+      "file": "src/server/dashboard/src/components/KeyList.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/components/UsageHistory.tsx",
+      "file": "src/server/dashboard/src/components/UsageHistory.tsx"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/plans.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/plans.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety-architecture.test.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety-architecture.test.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety.test.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety.test.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/plans.test.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/plans.test.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/offline-ant/pi-tmux/extensions/supervisor.ts",
+      "file": ".pi/git/github.com/offline-ant/pi-tmux/extensions/supervisor.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/offline-ant/pi-tmux/extensions/tmux.ts",
+      "file": ".pi/git/github.com/offline-ant/pi-tmux/extensions/tmux.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/extensions/plan-mode/index.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/extensions/plan-mode/index.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/engine.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/engine.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/guards.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/guards.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/index.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/index.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/parser.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/parser.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/registry.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/registry.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/types.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/types.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/utils.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/utils.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/core.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/core.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/definitions.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/definitions.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/git.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/git.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/system.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/system.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/text.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/text.ts"
+    },
+    {
+      "type": "dependency",
+      "name": "@fastify/cors",
+      "file": "package.json",
+      "line": 32
+    },
+    {
+      "type": "dependency",
+      "name": "@fastify/static",
+      "file": "package.json",
+      "line": 33
+    },
+    {
+      "type": "dependency",
+      "name": "ink-search-select",
+      "file": "package.json",
+      "line": 38
+    },
+    {
+      "type": "dependency",
+      "name": "node-cron",
+      "file": "package.json",
+      "line": 41
+    },
+    {
+      "type": "devDependency",
+      "name": "@clerk/fastify",
+      "file": "package.json",
+      "line": 47
+    },
+    {
+      "type": "unlisted",
+      "name": "@vitest/coverage-v8",
+      "file": "vitest.config.ts"
+    },
+    {
+      "type": "export",
+      "name": "configManager",
+      "file": "src/config/manager.ts",
+      "line": 161
+    },
+    {
+      "type": "export",
+      "name": "APIProvider",
+      "file": "src/shared/types.ts",
+      "line": 94
+    },
+    {
+      "type": "export",
+      "name": "OnePasswordError",
+      "file": "src/config/onepassword.ts",
+      "line": 20
+    },
+    {
+      "type": "export",
+      "name": "ServiceConfigSchema",
+      "file": "src/config/services.ts",
+      "line": 3
+    },
+    {
+      "type": "export",
+      "name": "guessServiceTypeFromKey",
+      "file": "src/config/services.ts",
+      "line": 212
+    },
+    {
+      "type": "export",
+      "name": "schema",
+      "file": "src/db/index.ts",
+      "line": 12
+    },
+    {
+      "type": "export",
+      "name": "ProviderName",
+      "file": "src/shared/provider-factory.ts",
+      "line": 17
+    },
+    {
+      "type": "export",
+      "name": "ProviderConfig",
+      "file": "src/config/schema.ts",
+      "line": 44
+    },
+    {
+      "type": "export",
+      "name": "NotificationConfig",
+      "file": "src/config/schema.ts",
+      "line": 45
+    },
+    {
+      "type": "export",
+      "name": "ThresholdConfig",
+      "file": "src/config/schema.ts",
+      "line": 46
+    },
+    {
+      "type": "export",
+      "name": "Config",
+      "file": "src/config/schema.ts",
+      "line": 47
+    }
+  ],
+  "unusedExports": [
+    {
+      "type": "export",
+      "name": "configManager",
+      "file": "src/config/manager.ts",
+      "line": 161
+    },
+    {
+      "type": "export",
+      "name": "APIProvider",
+      "file": "src/shared/types.ts",
+      "line": 94
+    },
+    {
+      "type": "export",
+      "name": "OnePasswordError",
+      "file": "src/config/onepassword.ts",
+      "line": 20
+    },
+    {
+      "type": "export",
+      "name": "ServiceConfigSchema",
+      "file": "src/config/services.ts",
+      "line": 3
+    },
+    {
+      "type": "export",
+      "name": "guessServiceTypeFromKey",
+      "file": "src/config/services.ts",
+      "line": 212
+    },
+    {
+      "type": "export",
+      "name": "schema",
+      "file": "src/db/index.ts",
+      "line": 12
+    },
+    {
+      "type": "export",
+      "name": "ProviderName",
+      "file": "src/shared/provider-factory.ts",
+      "line": 17
+    },
+    {
+      "type": "export",
+      "name": "ProviderConfig",
+      "file": "src/config/schema.ts",
+      "line": 44
+    },
+    {
+      "type": "export",
+      "name": "NotificationConfig",
+      "file": "src/config/schema.ts",
+      "line": 45
+    },
+    {
+      "type": "export",
+      "name": "ThresholdConfig",
+      "file": "src/config/schema.ts",
+      "line": 46
+    },
+    {
+      "type": "export",
+      "name": "Config",
+      "file": "src/config/schema.ts",
+      "line": 47
+    }
+  ],
+  "unusedFiles": [
+    {
+      "type": "file",
+      "name": "src/config/loader.ts",
+      "file": "src/config/loader.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/checker.ts",
+      "file": "src/server/checker.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/scheduler.ts",
+      "file": "src/server/scheduler.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/extensions/file-review/FileBrowser.ts",
+      "file": ".pi/extensions/file-review/FileBrowser.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/extensions/file-review/index.ts",
+      "file": ".pi/extensions/file-review/index.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-check-update.js",
+      "file": ".pi/gsd/hooks/gsd-check-update.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-context-monitor.js",
+      "file": ".pi/gsd/hooks/gsd-context-monitor.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-prompt-guard.js",
+      "file": ".pi/gsd/hooks/gsd-prompt-guard.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-statusline.js",
+      "file": ".pi/gsd/hooks/gsd-statusline.js"
+    },
+    {
+      "type": "file",
+      "name": ".pi/gsd/hooks/gsd-workflow-guard.js",
+      "file": ".pi/gsd/hooks/gsd-workflow-guard.js"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/vite.config.ts",
+      "file": "src/server/dashboard/vite.config.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/discord.ts",
+      "file": "src/server/notifications/discord.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/email.ts",
+      "file": "src/server/notifications/email.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/index.ts",
+      "file": "src/server/notifications/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/notifications/slack.ts",
+      "file": "src/server/notifications/slack.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/App.tsx",
+      "file": "src/server/dashboard/src/App.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/api.ts",
+      "file": "src/server/dashboard/src/api.ts"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/main.tsx",
+      "file": "src/server/dashboard/src/main.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/components/AddKeyForm.tsx",
+      "file": "src/server/dashboard/src/components/AddKeyForm.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/components/KeyList.tsx",
+      "file": "src/server/dashboard/src/components/KeyList.tsx"
+    },
+    {
+      "type": "file",
+      "name": "src/server/dashboard/src/components/UsageHistory.tsx",
+      "file": "src/server/dashboard/src/components/UsageHistory.tsx"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/plans.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/plans.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety-architecture.test.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety-architecture.test.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety.test.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/bash-safety.test.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/plans.test.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/tests/plans.test.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/offline-ant/pi-tmux/extensions/supervisor.ts",
+      "file": ".pi/git/github.com/offline-ant/pi-tmux/extensions/supervisor.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/offline-ant/pi-tmux/extensions/tmux.ts",
+      "file": ".pi/git/github.com/offline-ant/pi-tmux/extensions/tmux.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/extensions/plan-mode/index.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/extensions/plan-mode/index.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/engine.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/engine.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/guards.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/guards.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/index.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/index.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/parser.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/parser.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/registry.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/registry.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/types.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/types.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/utils.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/utils.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/core.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/core.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/definitions.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/definitions.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/git.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/git.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/system.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/system.ts"
+    },
+    {
+      "type": "file",
+      "name": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/text.ts",
+      "file": ".pi/git/github.com/Jabbslad/pi-plan-mode/lib/bash-safety/policies/text.ts"
+    }
+  ],
+  "unusedDeps": [
+    {
+      "type": "dependency",
+      "name": "@fastify/cors",
+      "file": "package.json",
+      "line": 32
+    },
+    {
+      "type": "dependency",
+      "name": "@fastify/static",
+      "file": "package.json",
+      "line": 33
+    },
+    {
+      "type": "dependency",
+      "name": "ink-search-select",
+      "file": "package.json",
+      "line": 38
+    },
+    {
+      "type": "dependency",
+      "name": "node-cron",
+      "file": "package.json",
+      "line": 41
+    },
+    {
+      "type": "devDependency",
+      "name": "@clerk/fastify",
+      "file": "package.json",
+      "line": 47
+    }
+  ],
+  "unlistedDeps": [
+    {
+      "type": "unlisted",
+      "name": "@vitest/coverage-v8",
+      "file": "vitest.config.ts"
+    }
+  ],
+  "summary": "Found 58 issues"
+}
