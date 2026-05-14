@@ -1,8 +1,8 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import type { FastifyPluginAsync } from "fastify";
 import { db } from "../../db/index.js";
 import { clients, usageChecks } from "../../db/schema.js";
-import { clientRegistry } from "../client-registry.js";
+import { runDiscoveryAndSync } from "../onepassword-discovery.js";
 
 export const clientRoutes: FastifyPluginAsync = async (server) => {
 	// GET /api/clients — list all clients with latest check status per client
@@ -51,5 +51,34 @@ export const clientRoutes: FastifyPluginAsync = async (server) => {
 			.orderBy(clients.name);
 
 		return reply.send({ clients: result });
+	});
+
+	// POST /api/sync — run 1Password discovery and sync clients into the database
+	server.post("/api/sync", async (_request, reply) => {
+		const masterToken = process.env.OP_SERVICE_ACCOUNT_TOKEN;
+		if (!masterToken) {
+			return reply.status(503).send({
+				error: "OP_SERVICE_ACCOUNT_TOKEN not set",
+				message: "Set OP_SERVICE_ACCOUNT_TOKEN in environment to enable 1Password discovery",
+			});
+		}
+
+		try {
+			const clients = await runDiscoveryAndSync();
+			return reply.send({
+				status: "ok",
+				clients: clients.map((c) => ({
+					id: c.id,
+					name: c.name,
+					slug: c.slug,
+					isActive: c.isActive,
+				})),
+			});
+		} catch (error) {
+			_request.log.error(error, "Sync failed");
+			return reply.status(500).send({
+				error: error instanceof Error ? error.message : "Sync failed",
+			});
+		}
 	});
 };

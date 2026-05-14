@@ -26,9 +26,7 @@ function makeTestClient(overrides?: Partial<NewClient>): NewClient {
 }
 
 async function cleanupTestClients() {
-	await db
-		.delete(clients)
-		.where(sql`name LIKE ${`${TEST_PREFIX}-%`}`);
+	await db.delete(clients).where(sql`name LIKE ${`${TEST_PREFIX}-%`}`);
 }
 
 import { sql } from "drizzle-orm";
@@ -176,15 +174,41 @@ describe("Slice 2: Client Registry API", () => {
 			expect(newClient).toBeDefined();
 
 			// Cleanup
-			await db
-				.delete(clients)
-				.where(
-					eq(
-						clients.slug,
-						discovered[1].slug,
-					),
-				);
+			await db.delete(clients).where(eq(clients.slug, discovered[1].slug));
 			await db.delete(clients).where(eq(clients.id, existing.id));
+		});
+
+		it("syncFromDiscovery deactivates clients not in the discovered list", async () => {
+			const { clientRegistry } = await import("../server/client-registry.js");
+
+			// Create two clients — A stays active, B should be deactivated
+			const clientA = await clientRegistry.createClient(makeTestClient());
+			const clientB = await clientRegistry.createClient(makeTestClient());
+
+			// Sync with only client A in the discovered list
+			await clientRegistry.syncFromDiscovery([
+				{
+					name: clientA.name,
+					vaultName: clientA.vaultName,
+					slug: clientA.slug,
+					serviceAccountToken: "ops_a",
+					keys: [],
+				},
+			]);
+
+			// Verify A is still active
+			const refreshedA = await clientRegistry.getClient(clientA.id);
+			expect(refreshedA).toBeDefined();
+			expect(refreshedA!.isActive).toBe(true);
+
+			// Verify B was deactivated
+			const refreshedB = await clientRegistry.getClient(clientB.id);
+			expect(refreshedB).toBeDefined();
+			expect(refreshedB!.isActive).toBe(false);
+
+			// Cleanup
+			await db.delete(clients).where(eq(clients.id, clientA.id));
+			await db.delete(clients).where(eq(clients.id, clientB.id));
 		});
 	});
 
@@ -193,7 +217,10 @@ describe("Slice 2: Client Registry API", () => {
 
 		afterEach(async () => {
 			for (const id of testClientIds) {
-				await db.delete(clients).where(eq(clients.id, id)).catch(() => {});
+				await db
+					.delete(clients)
+					.where(eq(clients.id, id))
+					.catch(() => {});
 			}
 			testClientIds = [];
 		});
@@ -222,7 +249,9 @@ describe("Slice 2: Client Registry API", () => {
 			});
 
 			const body = JSON.parse(response.body);
-			const found = body.clients.find((c: { id: string }) => c.id === created.id);
+			const found = body.clients.find(
+				(c: { id: string }) => c.id === created.id,
+			);
 			expect(found).toBeDefined();
 			expect(found.name).toBe(data.name);
 		});
@@ -239,7 +268,9 @@ describe("Slice 2: Client Registry API", () => {
 			});
 
 			const body = JSON.parse(response.body);
-			const found = body.clients.find((c: { id: string }) => c.id === created.id);
+			const found = body.clients.find(
+				(c: { id: string }) => c.id === created.id,
+			);
 			expect(found).toBeDefined();
 			// Should have a lastCheckStatus field (may be null if no checks exist)
 			expect(found).toHaveProperty("lastCheckStatus");
