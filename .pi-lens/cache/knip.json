@@ -279,6 +279,60 @@
     },
     {
       "type": "export",
+      "name": "listClients",
+      "file": "src/server/client-registry.ts",
+      "line": 39
+    },
+    {
+      "type": "export",
+      "name": "getClient",
+      "file": "src/server/client-registry.ts",
+      "line": 46
+    },
+    {
+      "type": "export",
+      "name": "createClient",
+      "file": "src/server/client-registry.ts",
+      "line": 58
+    },
+    {
+      "type": "export",
+      "name": "updateClient",
+      "file": "src/server/client-registry.ts",
+      "line": 66
+    },
+    {
+      "type": "export",
+      "name": "deactivateClient",
+      "file": "src/server/client-registry.ts",
+      "line": 81
+    },
+    {
+      "type": "export",
+      "name": "activateClient",
+      "file": "src/server/client-registry.ts",
+      "line": 93
+    },
+    {
+      "type": "export",
+      "name": "syncFromDiscovery",
+      "file": "src/server/client-registry.ts",
+      "line": 111
+    },
+    {
+      "type": "export",
+      "name": "DiscoveredClient",
+      "file": "src/server/client-registry.ts",
+      "line": 8
+    },
+    {
+      "type": "export",
+      "name": "ClientUpdateData",
+      "file": "src/server/client-registry.ts",
+      "line": 20
+    },
+    {
+      "type": "export",
       "name": "ProviderName",
       "file": "src/shared/provider-factory.ts",
       "line": 17
@@ -344,6 +398,60 @@
       "name": "schema",
       "file": "src/db/index.ts",
       "line": 12
+    },
+    {
+      "type": "export",
+      "name": "listClients",
+      "file": "src/server/client-registry.ts",
+      "line": 39
+    },
+    {
+      "type": "export",
+      "name": "getClient",
+      "file": "src/server/client-registry.ts",
+      "line": 46
+    },
+    {
+      "type": "export",
+      "name": "createClient",
+      "file": "src/server/client-registry.ts",
+      "line": 58
+    },
+    {
+      "type": "export",
+      "name": "updateClient",
+      "file": "src/server/client-registry.ts",
+      "line": 66
+    },
+    {
+      "type": "export",
+      "name": "deactivateClient",
+      "file": "src/server/client-registry.ts",
+      "line": 81
+    },
+    {
+      "type": "export",
+      "name": "activateClient",
+      "file": "src/server/client-registry.ts",
+      "line": 93
+    },
+    {
+      "type": "export",
+      "name": "syncFromDiscovery",
+      "file": "src/server/client-registry.ts",
+      "line": 111
+    },
+    {
+      "type": "export",
+      "name": "DiscoveredClient",
+      "file": "src/server/client-registry.ts",
+      "line": 8
+    },
+    {
+      "type": "export",
+      "name": "ClientUpdateData",
+      "file": "src/server/client-registry.ts",
+      "line": 20
     },
     {
       "type": "export",
@@ -622,5 +730,5 @@
       "file": "vitest.config.ts"
     }
   ],
-  "summary": "Found 58 issues"
+  "summary": "Found 67 issues"
 }

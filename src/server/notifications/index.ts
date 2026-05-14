@@ -11,6 +11,8 @@ import type { CheckResult } from "../checker.js";
  * Process check results and send notifications based on client configs.
  * Stub — will be implemented in Slice 5.
  */
-export async function processNotifications(_results: CheckResult[]): Promise<void> {
+export async function processNotifications(
+	_results: CheckResult[],
+): Promise<void> {
 	// Stub — no-op until Slice 5
 }

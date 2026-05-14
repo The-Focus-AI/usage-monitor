@@ -1,4 +1,4 @@
 {
-  "signature": "src/server/checker.ts::🕸️ Impact cascade from edited file:\nRisk: exported symbol changed\n📐 Cascade errors in 1 neighbor file(s) — fix before finishing turn:\n<diagnostics file=\"src/__tests__/slice1.test.ts\" reason=\"fallback\">\n  line 30, col 19 rule=cascade:7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type\n</diagnostics>",
+  "signature": "src/server/client-registry.ts|src/server/index.ts|src/server/routes/clients.ts::🕸️ Impact cascade from edited file:\nDirect callers: slice1.test.ts, slice2.test.ts, main.ts\nCheck next: slice1.test.ts, slice2.test.ts, main.ts\nRisk: exported symbol changed\n📐 Cascade errors in 1 neighbor file(s) — fix before finishing turn:\n<diagnostics file=\"src/__tests__/slice1.test.ts\" reason=\"calls\">\n  line 31, col 4 rule=cascade:7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type\n</diagnostics>",
   "sessionId": "lens-mp5p8jr3-a864fdeb"
 }

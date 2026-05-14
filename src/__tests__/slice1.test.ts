@@ -27,7 +27,8 @@ describe("Slice 1: New schema + server boots clean", () => {
 		expect(schema.oauthTokens).toBeUndefined();
 
 		// Verify clients table has expected columns via Drizzle internal symbol
-		const columns = schema.clients[Symbol.for("drizzle:Columns") as unknown as string];
+		const columns =
+			schema.clients[Symbol.for("drizzle:Columns") as unknown as string];
 		const columnNames = Object.keys(columns);
 		expect(columnNames).toContain("id");
 		expect(columnNames).toContain("name");
@@ -89,9 +90,18 @@ describe("Slice 1: New schema + server boots clean", () => {
 			const entries = await fs.readdir(dir, { withFileTypes: true });
 			for (const entry of entries) {
 				const fullPath = path.join(dir, entry.name);
-				if (entry.isDirectory() && !entry.name.startsWith(".") && entry.name !== "node_modules") {
+				if (
+					entry.isDirectory() &&
+					!entry.name.startsWith(".") &&
+					entry.name !== "node_modules"
+				) {
 					await walk(fullPath);
-				} else if (entry.isFile() && entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts") && entry.name !== "slice1.test.ts") {
+				} else if (
+					entry.isFile() &&
+					entry.name.endsWith(".ts") &&
+					!entry.name.endsWith(".test.ts") &&
+					entry.name !== "slice1.test.ts"
+				) {
 					const content = await fs.readFile(fullPath, "utf-8");
 					for (const term of forbidden) {
 						if (content.includes(term)) {

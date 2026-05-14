@@ -71,8 +71,7 @@ export const notificationLog = pgTable(
 		clientId: uuid("client_id")
 			.notNull()
 			.references(() => clients.id, { onDelete: "cascade" }),
-		channel: text("channel", { enum: ["slack", "discord", "email"] })
-			.notNull(),
+		channel: text("channel", { enum: ["slack", "discord", "email"] }).notNull(),
 		sentAt: timestamp("sent_at").defaultNow().notNull(),
 		message: text("message").notNull(),
 		status: text("status", { enum: ["sent", "failed"] })
