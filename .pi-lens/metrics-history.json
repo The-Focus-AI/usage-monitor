@@ -98,8 +98,8 @@
     },
     "src/shared/types.ts": {
       "latest": {
-        "commit": "d5873ae",
-        "timestamp": "2026-05-14T13:01:22.674Z",
+        "commit": "fcdd31d",
+        "timestamp": "2026-05-15T00:50:03.694Z",
         "mi": 40.9,
         "cognitive": 24,
         "nesting": 6,
@@ -121,6 +121,16 @@
         {
           "commit": "d5873ae",
           "timestamp": "2026-05-14T13:01:22.674Z",
+          "mi": 40.9,
+          "cognitive": 24,
+          "nesting": 6,
+          "lines": 81,
+          "maxCyclomatic": 9,
+          "entropy": 5.91
+        },
+        {
+          "commit": "fcdd31d",
+          "timestamp": "2026-05-15T00:50:03.694Z",
           "mi": 40.9,
           "cognitive": 24,
           "nesting": 6,
@@ -503,8 +513,8 @@
     },
     "src/shared/provider-factory.ts": {
       "latest": {
-        "commit": "d5873ae",
-        "timestamp": "2026-05-14T13:01:22.688Z",
+        "commit": "fcdd31d",
+        "timestamp": "2026-05-15T00:50:03.681Z",
         "mi": 37.6,
         "cognitive": 46,
         "nesting": 2,
@@ -552,9 +562,19 @@
           "lines": 72,
           "maxCyclomatic": 17,
           "entropy": 4.28
+        },
+        {
+          "commit": "fcdd31d",
+          "timestamp": "2026-05-15T00:50:03.681Z",
+          "mi": 37.6,
+          "cognitive": 46,
+          "nesting": 2,
+          "lines": 72,
+          "maxCyclomatic": 17,
+          "entropy": 4.28
         }
       ],
-      "trend": "regressing"
+      "trend": "stable"
     },
     "src/server/notifications/index.ts": {
       "latest": {
@@ -2190,7 +2210,82 @@
         }
       ],
       "trend": "stable"
+    },
+    "src/server/onepassword-discovery.ts": {
+      "latest": {
+        "commit": "fcdd31d",
+        "timestamp": "2026-05-14T23:42:36.481Z",
+        "mi": 35.6,
+        "cognitive": 33,
+        "nesting": 5,
+        "lines": 210,
+        "maxCyclomatic": 8,
+        "entropy": 6.23
+      },
+      "history": [
+        {
+          "commit": "fcdd31d",
+          "timestamp": "2026-05-14T23:42:36.481Z",
+          "mi": 35.6,
+          "cognitive": 33,
+          "nesting": 5,
+          "lines": 210,
+          "maxCyclomatic": 8,
+          "entropy": 6.23
+        }
+      ],
+      "trend": "stable"
+    },
+    "src/__tests__/slice3.test.ts": {
+      "latest": {
+        "commit": "fcdd31d",
+        "timestamp": "2026-05-15T00:50:25.981Z",
+        "mi": 52.3,
+        "cognitive": 0,
+        "nesting": 1,
+        "lines": 22,
+        "maxCyclomatic": 1,
+        "entropy": 4.71
+      },
+      "history": [
+        {
+          "commit": "fcdd31d",
+          "timestamp": "2026-05-15T00:50:25.981Z",
+          "mi": 52.3,
+          "cognitive": 0,
+          "nesting": 1,
+          "lines": 22,
+          "maxCyclomatic": 1,
+          "entropy": 4.71
+        }
+      ],
+      "trend": "stable"
+    },
+    "src/server/usage-store.ts": {
+      "latest": {
+        "commit": "fcdd31d",
+        "timestamp": "2026-05-15T00:50:52.248Z",
+        "mi": 44.6,
+        "cognitive": 2,
+        "nesting": 2,
+        "lines": 101,
+        "maxCyclomatic": 2,
+        "entropy": 5.89
+      },
+      "history": [
+        {
+          "commit": "fcdd31d",
+          "timestamp": "2026-05-15T00:50:52.248Z",
+          "mi": 44.6,
+          "cognitive": 2,
+          "nesting": 2,
+          "lines": 101,
+          "maxCyclomatic": 2,
+          "entropy": 5.89
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-05-14T23:31:26.032Z"
+  "capturedAt": "2026-05-15T00:50:57.249Z"
 }

@@ -260,7 +260,9 @@ export async function runDiscovery(): Promise<DiscoveredClient[]> {
  * Run full discovery and sync results into the database.
  * Returns the synced clients.
  */
-export async function runDiscoveryAndSync(): Promise<Awaited<ReturnType<typeof clientRegistry.syncFromDiscovery>>> {
+export async function runDiscoveryAndSync(): Promise<
+	Awaited<ReturnType<typeof clientRegistry.syncFromDiscovery>>
+> {
 	const discovered = await runDiscovery();
 	return clientRegistry.syncFromDiscovery(discovered);
 }

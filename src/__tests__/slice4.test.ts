@@ -13,7 +13,12 @@ const MOCK_VAULT_ITEMS = [
 		title: "client-a service account token",
 		category: "API_CREDENTIAL",
 		fields: [
-			{ id: "credential", label: "credential", value: "ops_client_a_token", purpose: null },
+			{
+				id: "credential",
+				label: "credential",
+				value: "ops_client_a_token",
+				purpose: null,
+			},
 			{ id: "vault", label: "vault", value: "client-a-vault", purpose: null },
 		],
 	},
@@ -22,7 +27,12 @@ const MOCK_VAULT_ITEMS = [
 		title: "client-b service account token",
 		category: "API_CREDENTIAL",
 		fields: [
-			{ id: "credential", label: "credential", value: "ops_client_b_token", purpose: null },
+			{
+				id: "credential",
+				label: "credential",
+				value: "ops_client_b_token",
+				purpose: null,
+			},
 			{ id: "vault", label: "vault", value: "client-b-vault", purpose: null },
 		],
 	},
@@ -39,19 +49,35 @@ const MOCK_CLIENT_A_ITEMS = [
 		id: "key-openai",
 		title: "OPENAI_API_KEY",
 		category: "PASSWORD",
-		fields: [{ id: "password", label: "password", value: "sk-openai-abc123", purpose: null }],
+		fields: [
+			{
+				id: "password",
+				label: "password",
+				value: "sk-openai-abc123",
+				purpose: null,
+			},
+		],
 	},
 	{
 		id: "key-claude",
 		title: "ANTHROPIC_API_KEY",
 		category: "PASSWORD",
-		fields: [{ id: "password", label: "password", value: "sk-ant-xyz789", purpose: null }],
+		fields: [
+			{
+				id: "password",
+				label: "password",
+				value: "sk-ant-xyz789",
+				purpose: null,
+			},
+		],
 	},
 	{
 		id: "not-a-key",
 		title: "AWS_SECRET_KEY",
 		category: "PASSWORD",
-		fields: [{ id: "password", label: "password", value: "not-mapped", purpose: null }],
+		fields: [
+			{ id: "password", label: "password", value: "not-mapped", purpose: null },
+		],
 	},
 ];
 
@@ -60,7 +86,14 @@ const MOCK_CLIENT_B_ITEMS = [
 		id: "key-google",
 		title: "GOOGLE_API_KEY",
 		category: "PASSWORD",
-		fields: [{ id: "password", label: "password", value: "google-key-123", purpose: null }],
+		fields: [
+			{
+				id: "password",
+				label: "password",
+				value: "google-key-123",
+				purpose: null,
+			},
+		],
 	},
 ];
 
@@ -138,9 +171,11 @@ describe("Slice 4: 1Password auto-discovery", () => {
 				// List all items in thefocus vault
 				"item list --vault thefocus --format json": MOCK_VAULT_ITEMS,
 				// Get details for client-a SA item
-				"item get sa-client-a --vault thefocus --format json": MOCK_VAULT_ITEMS[0],
+				"item get sa-client-a --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[0],
 				// Get details for client-b SA item
-				"item get sa-client-b --vault thefocus --format json": MOCK_VAULT_ITEMS[1],
+				"item get sa-client-b --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[1],
 			});
 
 			const result = await opDiscovery.discoverClients();
@@ -159,7 +194,12 @@ describe("Slice 4: 1Password auto-discovery", () => {
 
 			// Verify the correct op commands were called
 			expect(runOpMock).toHaveBeenCalledWith([
-				"item", "list", "--vault", "thefocus", "--format", "json",
+				"item",
+				"list",
+				"--vault",
+				"thefocus",
+				"--format",
+				"json",
 			]);
 		});
 
@@ -168,8 +208,10 @@ describe("Slice 4: 1Password auto-discovery", () => {
 
 			mockOpRunner({
 				"item list --vault thefocus --format json": MOCK_VAULT_ITEMS,
-				"item get sa-client-a --vault thefocus --format json": MOCK_VAULT_ITEMS[0],
-				"item get sa-client-b --vault thefocus --format json": MOCK_VAULT_ITEMS[1],
+				"item get sa-client-a --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[0],
+				"item get sa-client-b --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[1],
 			});
 
 			const result = await opDiscovery.discoverClients();
@@ -194,9 +236,12 @@ describe("Slice 4: 1Password auto-discovery", () => {
 		it("returns matching API keys from a client vault", async () => {
 			mockOpRunner({
 				"item list --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS,
-				"item get key-openai --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS[0],
-				"item get key-claude --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS[1],
-				"item get not-a-key --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS[2],
+				"item get key-openai --vault client-a-vault --format json":
+					MOCK_CLIENT_A_ITEMS[0],
+				"item get key-claude --vault client-a-vault --format json":
+					MOCK_CLIENT_A_ITEMS[1],
+				"item get not-a-key --vault client-a-vault --format json":
+					MOCK_CLIENT_A_ITEMS[2],
 			});
 
 			const result = await opDiscovery.discoverClientKeys(
@@ -218,7 +263,11 @@ describe("Slice 4: 1Password auto-discovery", () => {
 		it("filters out items not matching known env vars", async () => {
 			mockOpRunner({
 				"item list --vault unknown-vault --format json": [
-					{ id: "unknown-item", title: "SOME_UNKNOWN_KEY", category: "PASSWORD" },
+					{
+						id: "unknown-item",
+						title: "SOME_UNKNOWN_KEY",
+						category: "PASSWORD",
+					},
 				],
 			});
 
@@ -261,14 +310,20 @@ describe("Slice 4: 1Password auto-discovery", () => {
 
 			mockOpRunner({
 				"item list --vault thefocus --format json": MOCK_VAULT_ITEMS,
-				"item get sa-client-a --vault thefocus --format json": MOCK_VAULT_ITEMS[0],
-				"item get sa-client-b --vault thefocus --format json": MOCK_VAULT_ITEMS[1],
+				"item get sa-client-a --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[0],
+				"item get sa-client-b --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[1],
 				"item list --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS,
-				"item get key-openai --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS[0],
-				"item get key-claude --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS[1],
-				"item get not-a-key --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS[2],
+				"item get key-openai --vault client-a-vault --format json":
+					MOCK_CLIENT_A_ITEMS[0],
+				"item get key-claude --vault client-a-vault --format json":
+					MOCK_CLIENT_A_ITEMS[1],
+				"item get not-a-key --vault client-a-vault --format json":
+					MOCK_CLIENT_A_ITEMS[2],
 				"item list --vault client-b-vault --format json": MOCK_CLIENT_B_ITEMS,
-				"item get key-google --vault client-b-vault --format json": MOCK_CLIENT_B_ITEMS[0],
+				"item get key-google --vault client-b-vault --format json":
+					MOCK_CLIENT_B_ITEMS[0],
 			});
 
 			const result = await opDiscovery.runDiscovery();
@@ -315,8 +370,18 @@ describe("Slice 4: 1Password auto-discovery", () => {
 						title: "sync-test-client service account token",
 						category: "API_CREDENTIAL",
 						fields: [
-							{ id: "credential", label: "credential", value: "ops_sync_token", purpose: null },
-							{ id: "vault", label: "vault", value: "sync-test-vault", purpose: null },
+							{
+								id: "credential",
+								label: "credential",
+								value: "ops_sync_token",
+								purpose: null,
+							},
+							{
+								id: "vault",
+								label: "vault",
+								value: "sync-test-vault",
+								purpose: null,
+							},
 						],
 					},
 				],
@@ -325,8 +390,18 @@ describe("Slice 4: 1Password auto-discovery", () => {
 					title: "sync-test-client service account token",
 					category: "API_CREDENTIAL",
 					fields: [
-						{ id: "credential", label: "credential", value: "ops_sync_token", purpose: null },
-						{ id: "vault", label: "vault", value: "sync-test-vault", purpose: null },
+						{
+							id: "credential",
+							label: "credential",
+							value: "ops_sync_token",
+							purpose: null,
+						},
+						{
+							id: "vault",
+							label: "vault",
+							value: "sync-test-vault",
+							purpose: null,
+						},
 					],
 				},
 				"item list --vault sync-test-vault --format json": [
@@ -334,14 +409,28 @@ describe("Slice 4: 1Password auto-discovery", () => {
 						id: "key-perplexity",
 						title: "PERPLEXITY_API_KEY",
 						category: "PASSWORD",
-						fields: [{ id: "password", label: "password", value: "pplx-test", purpose: null }],
+						fields: [
+							{
+								id: "password",
+								label: "password",
+								value: "pplx-test",
+								purpose: null,
+							},
+						],
 					},
 				],
 				"item get key-perplexity --vault sync-test-vault --format json": {
 					id: "key-perplexity",
 					title: "PERPLEXITY_API_KEY",
 					category: "PASSWORD",
-					fields: [{ id: "password", label: "password", value: "pplx-test", purpose: null }],
+					fields: [
+						{
+							id: "password",
+							label: "password",
+							value: "pplx-test",
+							purpose: null,
+						},
+					],
 				},
 			});
 

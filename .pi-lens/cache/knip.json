@@ -8,11 +8,6 @@
     },
     {
       "type": "file",
-      "name": "src/server/checker.ts",
-      "file": "src/server/checker.ts"
-    },
-    {
-      "type": "file",
       "name": "src/server/scheduler.ts",
       "file": "src/server/scheduler.ts"
     },
@@ -492,11 +487,6 @@
     },
     {
       "type": "file",
-      "name": "src/server/checker.ts",
-      "file": "src/server/checker.ts"
-    },
-    {
-      "type": "file",
       "name": "src/server/scheduler.ts",
       "file": "src/server/scheduler.ts"
     },
@@ -730,5 +720,5 @@
       "file": "vitest.config.ts"
     }
   ],
-  "summary": "Found 67 issues"
+  "summary": "Found 66 issues"
 }

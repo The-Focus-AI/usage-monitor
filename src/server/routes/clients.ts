@@ -3,6 +3,9 @@ import type { FastifyPluginAsync } from "fastify";
 import { db } from "../../db/index.js";
 import { clients, usageChecks } from "../../db/schema.js";
 import { runDiscoveryAndSync } from "../onepassword-discovery.js";
+import { runProviderChecks } from "../checker.js";
+import { getCheckHistory } from "../usage-store.js";
+import { clientRegistry } from "../client-registry.js";
 
 export const clientRoutes: FastifyPluginAsync = async (server) => {
 	// GET /api/clients — list all clients with latest check status per client
@@ -59,7 +62,8 @@ export const clientRoutes: FastifyPluginAsync = async (server) => {
 		if (!masterToken) {
 			return reply.status(503).send({
 				error: "OP_SERVICE_ACCOUNT_TOKEN not set",
-				message: "Set OP_SERVICE_ACCOUNT_TOKEN in environment to enable 1Password discovery",
+				message:
+					"Set OP_SERVICE_ACCOUNT_TOKEN in environment to enable 1Password discovery",
 			});
 		}
 
@@ -81,4 +85,45 @@ export const clientRoutes: FastifyPluginAsync = async (server) => {
 			});
 		}
 	});
+
+	// POST /api/check — run provider checks for all active clients
+	server.post("/api/check", async (_request, reply) => {
+		try {
+			const results = await runProviderChecks();
+			const succeeded = results.filter((r) => r.status === "success").length;
+			const failed = results.filter((r) => r.status === "error").length;
+			return reply.send({
+				status: "ok",
+				results: results.map((r) => ({
+					clientId: r.clientId,
+					provider: r.provider,
+					status: r.status,
+					error: r.error,
+				})),
+				summary: { total: results.length, succeeded, failed },
+			});
+		} catch (error) {
+			_request.log.error(error, "Check failed");
+			return reply.status(500).send({
+				error: error instanceof Error ? error.message : "Check failed",
+			});
+		}
+	});
+
+	// GET /api/clients/:id/usage — check history for a client
+	server.get<{ Params: { id: string } }>(
+		"/api/clients/:id/usage",
+		async (request, reply) => {
+			const { id } = request.params;
+
+			// Verify the client exists
+			const client = await clientRegistry.getClient(id);
+			if (!client) {
+				return reply.status(404).send({ error: "Client not found" });
+			}
+
+			const checks = await getCheckHistory(id);
+			return reply.send({ clientId: id, checks });
+		},
+	);
 };
