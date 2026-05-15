@@ -4,6 +4,7 @@ import { db } from "../../db/index.js";
 import { clients, usageChecks } from "../../db/schema.js";
 import { runDiscoveryAndSync } from "../onepassword-discovery.js";
 import { runProviderChecks } from "../checker.js";
+import { runFullCycle } from "../scheduler.js";
 import { getCheckHistory } from "../usage-store.js";
 import { clientRegistry } from "../client-registry.js";
 
@@ -126,4 +127,34 @@ export const clientRoutes: FastifyPluginAsync = async (server) => {
 			return reply.send({ clientId: id, checks });
 		},
 	);
+
+	// POST /api/full-cycle — run the full discovery → check → notify cycle
+	server.post("/api/full-cycle", async (_request, reply) => {
+		try {
+			const { results, clients } = await runFullCycle();
+			const succeeded = results.filter((r) => r.status === "success").length;
+			const failed = results.filter((r) => r.status === "error").length;
+			return reply.send({
+				status: "ok",
+				results: results.map((r) => ({
+					clientId: r.clientId,
+					provider: r.provider,
+					status: r.status,
+					error: r.error,
+				})),
+				clients: clients.map((c) => ({
+					id: c.id,
+					name: c.name,
+					slug: c.slug,
+					isActive: c.isActive,
+				})),
+				summary: { total: results.length, succeeded, failed, clientCount: clients.length },
+			});
+		} catch (error) {
+			_request.log.error(error, "Full cycle failed");
+			return reply.status(500).send({
+				error: error instanceof Error ? error.message : "Full cycle failed",
+			});
+		}
+	});
 };

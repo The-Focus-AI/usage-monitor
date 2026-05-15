@@ -22,9 +22,7 @@ export interface InsertCheckData {
 /**
  * Insert a single check result. Returns the created record.
  */
-export async function insertCheck(
-	data: InsertCheckData,
-): Promise<UsageCheck> {
+export async function insertCheck(data: InsertCheckData): Promise<UsageCheck> {
 	const [result] = await db
 		.insert(usageChecks)
 		.values(data as typeof usageChecks.$inferInsert)
@@ -41,7 +39,7 @@ export async function insertChecks(
 	if (data.length === 0) return [];
 	const results = await db
 		.insert(usageChecks)
-		.values(data as typeof usageChecks.$inferInsert[])
+		.values(data as (typeof usageChecks.$inferInsert)[])
 		.returning();
 	return results;
 }
@@ -72,9 +70,7 @@ export async function getLatestCheck(
  * Get the latest check per provider for a given client.
  * Uses a windowed subquery to pick the most recent check per provider.
  */
-export async function getLatestChecks(
-	clientId: string,
-): Promise<UsageCheck[]> {
+export async function getLatestChecks(clientId: string): Promise<UsageCheck[]> {
 	const latestSubquery = db.$with("latest_per_provider").as(
 		db
 			.select({

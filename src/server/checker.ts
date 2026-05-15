@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { clients } from "../db/schema.js";
 import { PROVIDER_ENV_VAR_MAP } from "./onepassword-discovery.js";
+import type { DiscoveredClientKey } from "./onepassword-discovery.js";
 import { insertCheck } from "./usage-store.js";
 import { createProvider } from "../shared/provider-factory.js";
 import type { UsageData, BillingData } from "../shared/types.js";
@@ -13,32 +14,21 @@ export interface CheckResult {
 	usage?: UsageData;
 	billing?: BillingData | null;
 	error?: string;
-	envVarName?: string;
 }
 
+// ── Core check function ──
+
 /**
- * Run a usage check for a single provider using a key from an env var.
+ * Run a usage check for a single provider with a given API key.
  */
-async function checkProviderByEnvVar(
+async function checkProvider(
 	clientId: string,
 	provider: string,
-	envVarName: string,
+	apiKey: string,
 ): Promise<CheckResult> {
-	const apiKey = process.env[envVarName];
-	if (!apiKey) {
-		return {
-			clientId,
-			provider,
-			status: "error",
-			error: `${envVarName} not set in environment`,
-			envVarName,
-		};
-	}
-
 	try {
 		const providerInstance = createProvider(provider, apiKey);
 
-		// Authenticate first
 		const isAuthenticated = await providerInstance.authenticate();
 		if (!isAuthenticated) {
 			return {
@@ -46,11 +36,9 @@ async function checkProviderByEnvVar(
 				provider,
 				status: "error",
 				error: "Authentication failed — key may be invalid or expired",
-				envVarName,
 			};
 		}
 
-		// Fetch usage and billing in parallel
 		const [usage, billing] = await Promise.all([
 			providerInstance.getUsage(),
 			typeof providerInstance.getBilling === "function"
@@ -58,31 +46,78 @@ async function checkProviderByEnvVar(
 				: null,
 		]);
 
-		return {
-			clientId,
-			provider,
-			status: "success",
-			usage,
-			billing,
-			envVarName,
-		};
+		return { clientId, provider, status: "success", usage, billing };
 	} catch (error) {
 		return {
 			clientId,
 			provider,
 			status: "error",
 			error: error instanceof Error ? error.message : "Unknown error",
-			envVarName,
 		};
 	}
 }
 
+// ── Store helper ──
+
+async function storeCheckResult(result: CheckResult): Promise<void> {
+	try {
+		await insertCheck({
+			clientId: result.clientId,
+			provider: result.provider,
+			status: result.status,
+			balance:
+				result.usage?.remainingBalance?.toString() ??
+				result.billing?.currentBalance?.toString() ??
+				null,
+			spend:
+				result.usage?.totalCost?.toString() ??
+				result.billing?.monthlySpend?.toString() ??
+				null,
+			limitRemaining:
+				result.billing?.usageLimits?.monthly?.toString() ?? null,
+			errorMessage: result.error ?? null,
+			rawResponse: result.usage ?? null,
+		});
+	} catch (storeError) {
+		console.error(
+			`[checker] Failed to store result for ${result.provider}:`,
+			storeError,
+		);
+	}
+}
+
+// ── Public API ──
+
 /**
- * Run provider checks for all active clients.
- *
- * For each active client, resolves API keys from environment variables
- * matching the provider-to-env-var mapping, runs each provider check,
- * and stores results in the usage_checks table.
+ * Run checks for a client using provided API keys (from 1Password discovery).
+ * Each key includes provider, envVarName, and the actual value.
+ */
+export async function checkClientKeys(
+	clientId: string,
+	keys: DiscoveredClientKey[],
+): Promise<CheckResult[]> {
+	if (keys.length === 0) return [];
+
+	const promises = keys.map((key) => checkProvider(clientId, key.provider, key.value));
+	const settled = await Promise.allSettled(promises);
+
+	const results: CheckResult[] = [];
+	for (const result of settled) {
+		if (result.status === "fulfilled") {
+			results.push(result.value);
+			await storeCheckResult(result.value);
+		}
+	}
+
+	console.log(
+		`[checker] Client ${clientId}: ${results.filter((r) => r.status === "success").length} ok, ${results.filter((r) => r.status === "error").length} failed`,
+	);
+
+	return results;
+}
+
+/**
+ * Run provider checks for all active clients using environment variables.
  */
 export async function runProviderChecks(): Promise<CheckResult[]> {
 	const activeClients = await db
@@ -98,55 +133,32 @@ export async function runProviderChecks(): Promise<CheckResult[]> {
 	const allResults: CheckResult[] = [];
 
 	for (const client of activeClients) {
-		// For each provider, check if the env var is set
 		const providerPromises = Object.entries(PROVIDER_ENV_VAR_MAP).map(
-			([provider, envVarName]) =>
-				checkProviderByEnvVar(client.id, provider, envVarName),
+			([provider, envVarName]) => {
+				const apiKey = process.env[envVarName];
+				if (!apiKey) {
+					return Promise.resolve({
+						clientId: client.id,
+						provider,
+						status: "error" as const,
+						error: `${envVarName} not set in environment`,
+					} as CheckResult);
+				}
+				return checkProvider(client.id, provider, apiKey);
+			},
 		);
 
-		// Run checks in parallel with error isolation
 		const settled = await Promise.allSettled(providerPromises);
-
 		for (const result of settled) {
 			if (result.status === "fulfilled") {
-				const checkResult = result.value;
-				allResults.push(checkResult);
-
-				// Store the result in the database
-				try {
-					await insertCheck({
-						clientId: checkResult.clientId,
-						provider: checkResult.provider,
-						status: checkResult.status,
-						balance:
-							checkResult.usage?.remainingBalance?.toString() ??
-							checkResult.billing?.currentBalance?.toString() ??
-							null,
-						spend:
-							checkResult.usage?.totalCost?.toString() ??
-							checkResult.billing?.monthlySpend?.toString() ??
-							null,
-						limitRemaining:
-							checkResult.billing?.usageLimits?.monthly?.toString() ?? null,
-						errorMessage: checkResult.error ?? null,
-						rawResponse: checkResult.usage ?? null,
-					});
-				} catch (storeError) {
-					console.error(
-						`[checker] Failed to store result for ${checkResult.provider}:`,
-						storeError,
-					);
-				}
-			} else {
-				console.error("[checker] Promise rejected unexpectedly:", result.reason);
+				allResults.push(result.value);
+				await storeCheckResult(result.value);
 			}
 		}
 	}
 
-	const succeeded = allResults.filter((r) => r.status === "success").length;
-	const failed = allResults.filter((r) => r.status === "error").length;
 	console.log(
-		`[checker] Complete: ${succeeded} succeeded, ${failed} failed (${allResults.length} total)`,
+		`[checker] Complete: ${allResults.filter((r) => r.status === "success").length} succeeded, ${allResults.filter((r) => r.status === "error").length} failed`,
 	);
 
 	return allResults;

@@ -8,11 +8,6 @@
     },
     {
       "type": "file",
-      "name": "src/server/scheduler.ts",
-      "file": "src/server/scheduler.ts"
-    },
-    {
-      "type": "file",
       "name": ".pi/extensions/file-review/FileBrowser.ts",
       "file": ".pi/extensions/file-review/FileBrowser.ts"
     },
@@ -50,26 +45,6 @@
       "type": "file",
       "name": "src/server/dashboard/vite.config.ts",
       "file": "src/server/dashboard/vite.config.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/discord.ts",
-      "file": "src/server/notifications/discord.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/email.ts",
-      "file": "src/server/notifications/email.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/index.ts",
-      "file": "src/server/notifications/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/slack.ts",
-      "file": "src/server/notifications/slack.ts"
     },
     {
       "type": "file",
@@ -220,12 +195,6 @@
       "line": 38
     },
     {
-      "type": "dependency",
-      "name": "node-cron",
-      "file": "package.json",
-      "line": 41
-    },
-    {
       "type": "devDependency",
       "name": "@clerk/fastify",
       "file": "package.json",
@@ -325,6 +294,18 @@
       "name": "ClientUpdateData",
       "file": "src/server/client-registry.ts",
       "line": 20
+    },
+    {
+      "type": "export",
+      "name": "stopScheduler",
+      "file": "src/server/scheduler.ts",
+      "line": 97
+    },
+    {
+      "type": "export",
+      "name": "runManualCheck",
+      "file": "src/server/scheduler.ts",
+      "line": 108
     },
     {
       "type": "export",
@@ -450,6 +431,18 @@
     },
     {
       "type": "export",
+      "name": "stopScheduler",
+      "file": "src/server/scheduler.ts",
+      "line": 97
+    },
+    {
+      "type": "export",
+      "name": "runManualCheck",
+      "file": "src/server/scheduler.ts",
+      "line": 108
+    },
+    {
+      "type": "export",
       "name": "ProviderName",
       "file": "src/shared/provider-factory.ts",
       "line": 17
@@ -484,11 +477,6 @@
       "type": "file",
       "name": "src/config/loader.ts",
       "file": "src/config/loader.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/scheduler.ts",
-      "file": "src/server/scheduler.ts"
     },
     {
       "type": "file",
@@ -529,26 +517,6 @@
       "type": "file",
       "name": "src/server/dashboard/vite.config.ts",
       "file": "src/server/dashboard/vite.config.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/discord.ts",
-      "file": "src/server/notifications/discord.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/email.ts",
-      "file": "src/server/notifications/email.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/index.ts",
-      "file": "src/server/notifications/index.ts"
-    },
-    {
-      "type": "file",
-      "name": "src/server/notifications/slack.ts",
-      "file": "src/server/notifications/slack.ts"
     },
     {
       "type": "file",
@@ -701,12 +669,6 @@
       "line": 38
     },
     {
-      "type": "dependency",
-      "name": "node-cron",
-      "file": "package.json",
-      "line": 41
-    },
-    {
       "type": "devDependency",
       "name": "@clerk/fastify",
       "file": "package.json",
@@ -720,5 +682,5 @@
       "file": "vitest.config.ts"
     }
   ],
-  "summary": "Found 66 issues"
+  "summary": "Found 62 issues"
 }

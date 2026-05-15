@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";

@@ -1,4 +1,13 @@
-import { describe, beforeEach, it, expect, beforeAll, afterAll, afterEach, vi } from "vitest";
+import {
+	describe,
+	beforeEach,
+	it,
+	expect,
+	beforeAll,
+	afterAll,
+	afterEach,
+	vi,
+} from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { clients, usageChecks } from "../db/schema.js";
@@ -78,7 +87,10 @@ describe("Slice 3: Manual provider check via env var", () => {
 
 	afterEach(async () => {
 		for (const id of clientIds) {
-			await db.delete(clients).where(eq(clients.id, id)).catch(() => {});
+			await db
+				.delete(clients)
+				.where(eq(clients.id, id))
+				.catch(() => {});
 		}
 		clientIds = [];
 	});
@@ -113,9 +125,7 @@ describe("Slice 3: Manual provider check via env var", () => {
 			expect(result.provider).toBe("openai");
 			expect(result.status).toBe("success");
 
-			await db
-				.delete(usageChecks)
-				.where(eq(usageChecks.id, result.id));
+			await db.delete(usageChecks).where(eq(usageChecks.id, result.id));
 		});
 
 		it("insertChecks batch stores multiple results", async () => {
@@ -139,9 +149,7 @@ describe("Slice 3: Manual provider check via env var", () => {
 			expect(results[1].status).toBe("error");
 
 			for (const r of results) {
-				await db
-					.delete(usageChecks)
-					.where(eq(usageChecks.id, r.id));
+				await db.delete(usageChecks).where(eq(usageChecks.id, r.id));
 			}
 		});
 
@@ -158,21 +166,14 @@ describe("Slice 3: Manual provider check via env var", () => {
 				status: "success",
 			});
 
-			const latest = await usageStore.getLatestCheck(
-				testClientId,
-				"google",
-			);
+			const latest = await usageStore.getLatestCheck(testClientId, "google");
 
 			expect(latest).toBeDefined();
 			expect(latest!.id).toBe(newCheck.id);
 			expect(latest!.status).toBe("success");
 
-			await db
-				.delete(usageChecks)
-				.where(eq(usageChecks.id, oldCheck.id));
-			await db
-				.delete(usageChecks)
-				.where(eq(usageChecks.id, newCheck.id));
+			await db.delete(usageChecks).where(eq(usageChecks.id, oldCheck.id));
+			await db.delete(usageChecks).where(eq(usageChecks.id, newCheck.id));
 		});
 
 		it("getLatestCheck returns null when no checks exist", async () => {
@@ -202,9 +203,7 @@ describe("Slice 3: Manual provider check via env var", () => {
 			expect(providers).toEqual(["claude", "openai"]);
 
 			for (const c of latest) {
-				await db
-					.delete(usageChecks)
-					.where(eq(usageChecks.id, c.id));
+				await db.delete(usageChecks).where(eq(usageChecks.id, c.id));
 			}
 		});
 
@@ -226,9 +225,7 @@ describe("Slice 3: Manual provider check via env var", () => {
 			expect(history[0].id).toBe(checks[4].id);
 
 			for (const c of checks) {
-				await db
-					.delete(usageChecks)
-					.where(eq(usageChecks.id, c.id));
+				await db.delete(usageChecks).where(eq(usageChecks.id, c.id));
 			}
 		});
 	});
@@ -251,9 +248,7 @@ describe("Slice 3: Manual provider check via env var", () => {
 			process.env.OPENAI_API_KEY = "sk-test-openai";
 			process.env.CLAUDE_API_KEY = "sk-test-claude";
 
-			const { runProviderChecks } = await import(
-				"../server/checker.js"
-			);
+			const { runProviderChecks } = await import("../server/checker.js");
 			const results = await runProviderChecks();
 			expect(Array.isArray(results)).toBe(true);
 			// Should have results for all 14 providers (2 with keys, 12 without)
@@ -265,9 +260,7 @@ describe("Slice 3: Manual provider check via env var", () => {
 			delete process.env.OPENAI_API_KEY;
 			delete process.env.OPENROUTER_API_KEY;
 
-			const { runProviderChecks } = await import(
-				"../server/checker.js"
-			);
+			const { runProviderChecks } = await import("../server/checker.js");
 			const results = await runProviderChecks();
 			expect(Array.isArray(results)).toBe(true);
 			// All 14 providers should have "error" status (no keys)

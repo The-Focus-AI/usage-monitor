@@ -57,7 +57,7 @@ export async function getClient(id: string): Promise<Client | null> {
  */
 export async function createClient(data: NewClient): Promise<Client> {
 	const [client] = await db.insert(clients).values(data).returning();
-	return client;
+	return client!;
 }
 
 /**
@@ -147,7 +147,7 @@ export async function syncFromDiscovery(
 					lastSyncedAt: sql`now()`,
 				})
 				.returning();
-			results.push(created);
+			results.push(created!);
 		}
 	}
 

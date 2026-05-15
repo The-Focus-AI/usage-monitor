@@ -738,8 +738,8 @@
     },
     "vitest.config.ts": {
       "latest": {
-        "commit": "d5873ae",
-        "timestamp": "2026-05-03T13:41:08.957Z",
+        "commit": "7697622",
+        "timestamp": "2026-05-15T03:16:27.449Z",
         "mi": 69.7,
         "cognitive": 0,
         "nesting": 0,
@@ -761,6 +761,16 @@
         {
           "commit": "d5873ae",
           "timestamp": "2026-05-03T13:41:08.957Z",
+          "mi": 69.7,
+          "cognitive": 0,
+          "nesting": 0,
+          "lines": 17,
+          "maxCyclomatic": 1,
+          "entropy": 3.23
+        },
+        {
+          "commit": "7697622",
+          "timestamp": "2026-05-15T03:16:27.449Z",
           "mi": 69.7,
           "cognitive": 0,
           "nesting": 0,
@@ -1963,8 +1973,8 @@
     },
     "src/server/notifications/slack.ts": {
       "latest": {
-        "commit": "d5873ae",
-        "timestamp": "2026-05-14T13:54:41.901Z",
+        "commit": "7697622",
+        "timestamp": "2026-05-15T03:23:43.581Z",
         "mi": 47.6,
         "cognitive": 4,
         "nesting": 3,
@@ -1982,14 +1992,24 @@
           "lines": 53,
           "maxCyclomatic": 1,
           "entropy": 5.05
+        },
+        {
+          "commit": "7697622",
+          "timestamp": "2026-05-15T03:23:43.581Z",
+          "mi": 47.6,
+          "cognitive": 4,
+          "nesting": 3,
+          "lines": 53,
+          "maxCyclomatic": 1,
+          "entropy": 5.05
         }
       ],
       "trend": "stable"
     },
     "src/server/notifications/discord.ts": {
       "latest": {
-        "commit": "d5873ae",
-        "timestamp": "2026-05-14T13:54:41.916Z",
+        "commit": "7697622",
+        "timestamp": "2026-05-15T03:23:43.597Z",
         "mi": 50.5,
         "cognitive": 9,
         "nesting": 3,
@@ -2007,14 +2027,24 @@
           "lines": 38,
           "maxCyclomatic": 6,
           "entropy": 5.63
+        },
+        {
+          "commit": "7697622",
+          "timestamp": "2026-05-15T03:23:43.597Z",
+          "mi": 50.5,
+          "cognitive": 9,
+          "nesting": 3,
+          "lines": 38,
+          "maxCyclomatic": 6,
+          "entropy": 5.63
         }
       ],
       "trend": "stable"
     },
     "src/server/notifications/email.ts": {
       "latest": {
-        "commit": "d5873ae",
-        "timestamp": "2026-05-14T13:54:41.933Z",
+        "commit": "7697622",
+        "timestamp": "2026-05-15T03:23:43.611Z",
         "mi": 42,
         "cognitive": 14,
         "nesting": 2,
@@ -2026,6 +2056,16 @@
         {
           "commit": "d5873ae",
           "timestamp": "2026-05-14T13:54:41.933Z",
+          "mi": 42,
+          "cognitive": 14,
+          "nesting": 2,
+          "lines": 90,
+          "maxCyclomatic": 5,
+          "entropy": 5.6
+        },
+        {
+          "commit": "7697622",
+          "timestamp": "2026-05-15T03:23:43.611Z",
           "mi": 42,
           "cognitive": 14,
           "nesting": 2,
@@ -2287,5 +2327,5 @@
       "trend": "stable"
     }
   },
-  "capturedAt": "2026-05-15T00:50:57.249Z"
+  "capturedAt": "2026-05-15T03:23:48.612Z"
 }

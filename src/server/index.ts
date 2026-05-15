@@ -1,6 +1,7 @@
 import Fastify from "fastify";
 import { healthRoutes } from "./routes/health.js";
 import { clientRoutes } from "./routes/clients.js";
+import { startScheduler } from "./scheduler.js";
 
 export async function buildServer() {
 	const server = Fastify({
@@ -14,6 +15,9 @@ export async function buildServer() {
 
 	// Client registry API
 	await server.register(clientRoutes);
+
+	// Start the cron scheduler for periodic full cycles
+	startScheduler();
 
 	return server;
 }
