@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage Monitor — Validation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f4f0;
+      --paper: #efede8;
+      --blue: #0055aa;
+      --red: #d93025;
+      --gray: #8a8a86;
+      --light-gray: #c8c6c0;
+      --sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --page-w: 100vw;
+      --page-h: 100vh;
+    }
+    html {
+      font-family: var(--sans);
+      background: var(--white);
+      color: var(--black);
+      scroll-behavior: smooth;
+      overflow: hidden;
+    }
+    body {
+      display: flex;
+      flex-direction: row;
+      width: calc(var(--page-w) * 9); /* 8 slices + 1 cover */
+      height: var(--page-h);
+    }
+
+    /* ── page ── */
+    .page {
+      width: var(--page-w);
+      height: var(--page-h);
+      flex-shrink: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding: 48px 64px;
+      border-right: 1px solid var(--light-gray);
+    }
+    .page::-webkit-scrollbar { width: 4px; }
+    .page::-webkit-scrollbar-thumb { background: var(--gray); }
+
+    /* ── cover ── */
+    .cover {
+      justify-content: center;
+      background: var(--black);
+      color: var(--white);
+      border-right: none;
+    }
+    .cover .accent-line { background: var(--white); }
+    .cover .meta { color: var(--gray); }
+    .cover .nav-dots { bottom: 48px; }
+
+    /* ── typography ── */
+    .accent-line {
+      width: 48px; height: 4px;
+      background: var(--blue);
+      margin-bottom: 24px;
+    }
+    .meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+    h1 {
+      font-size: clamp(48px, 7vw, 88px);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    h1 .highlight { color: var(--blue); }
+    .cover h1 .highlight { color: var(--white); text-decoration: underline; text-decoration-color: var(--blue); text-underline-offset: 8px; }
+    h2 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    h3 {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--blue);
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--gray);
+      max-width: 540px;
+      margin-bottom: 32px;
+    }
+    .pill {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 4px 10px;
+      border: 1px solid var(--light-gray);
+      margin-bottom: 16px;
+    }
+    .pill-num {
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      padding: 4px 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    /* ── content grid ── */
+    .content { flex: 1; display: flex; flex-direction: column; gap: 16px; max-width: 700px; }
+    .content p, .content li { font-size: 13px; line-height: 1.6; color: var(--black); }
+    .content ul { padding-left: 20px; }
+    .content li { margin-bottom: 4px; }
+    .content strong { font-weight: 600; }
+    code {
+      font-family: var(--mono);
+      font-size: 11px;
+      background: var(--paper);
+      padding: 1px 5px;
+      border-radius: 2px;
+    }
+    pre {
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.5;
+      background: var(--paper);
+      padding: 12px 16px;
+      overflow-x: auto;
+      border-radius: 2px;
+      margin: 4px 0 8px;
+    }
+
+    /* ── summary grid ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2px;
+      margin: 24px 0;
+      border: 1px solid var(--black);
+    }
+    .summary-grid > div {
+      background: var(--paper);
+      padding: 16px 20px;
+    }
+    .summary-grid .num {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .summary-grid .label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    /* ── endpoints ── */
+    .endpoints { display: flex; flex-direction: column; gap: 2px; margin: 12px 0; }
+    .ep { display: flex; gap: 12px; font-family: var(--mono); font-size: 11px; padding: 6px 0; border-bottom: 1px solid var(--light-gray); }
+    .ep-method { font-weight: 600; color: var(--blue); min-width: 48px; }
+    .ep-path { flex: 1; }
+    .ep-desc { color: var(--gray); flex: 1; }
+
+    /* ── steps ── */
+    .step { counter-increment: step; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--blue);
+      min-width: 24px;
+      padding-top: 2px;
+    }
+
+    /* ── navigation ── */
+    .nav-dots {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+    .nav-dots a {
+      display: block;
+      width: 10px; height: 10px;
+      border: 1.5px solid var(--black);
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+    .nav-dots a:hover { background: var(--blue); border-color: var(--blue); }
+    .nav-dots a.active { background: var(--black); }
+
+    /* ── arrows ── */
+    .nav-arrows {
+      position: fixed;
+      bottom: 24px;
+      right: 32px;
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+    .nav-arrows a {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      border: 1.5px solid var(--black);
+      text-decoration: none;
+      color: var(--black);
+      transition: background 0.2s;
+    }
+    .nav-arrows a:hover { background: var(--black); color: var(--white); }
+
+    /* ── keyboard nav hint ── */
+    .hint {
+      position: fixed;
+      bottom: 24px;
+      left: 32px;
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--gray);
+      z-index: 100;
+    }
+
+    /* ── command block ── */
+    .cmd-block { margin: 8px 0; }
+    .cmd-block pre { margin: 0; }
+    .cmd-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gray);
+      margin-bottom: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .page { padding: 24px 20px; }
+      h1 { font-size: 32px; }
+      h2 { font-size: 22px; }
+      .subtitle { font-size: 13px; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .hint, .nav-arrows { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════ COVER ════════════════════ -->
+<div class="page cover" id="cover">
+  <div class="accent-line"></div>
+  <p class="meta">Focus.AI Labs · Project Validation</p>
+  <h1>USAGE<br>MONITOR</h1>
+  <p class="subtitle" style="color:var(--gray);">
+    7 slices · 138 tests · End-to-end validation<br>
+    <span style="font-family:var(--mono);font-size:11px;color:var(--gray);">op · neon · fastify · react · 1password</span>
+  </p>
+  <div style="flex:1;"></div>
+  <div style="display:flex;gap:48px;margin-bottom:32px;flex-wrap:wrap;">
+    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">7</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Slices</span></div>
+    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">138</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Tests</span></div>
+    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">3</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">DB Tables</span></div>
+    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">14</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Providers</span></div>
+  </div>
+  <p style="font-family:var(--mono);font-size:10px;color:var(--gray);">← → Navigate slices · Tap dots to jump</p>
+</div>
+
+<!-- ════════════════════ SLICE 1 ════════════════════ -->
+<div class="page" id="s1">
+  <span class="pill-num">01</span>
+  <h2>New schema + server boots clean</h2>
+  <p class="subtitle">Stripped 8 old DB tables down to 3. Deleted encryption, Clerk auth, OAuth, old route files.</p>
+
+  <div class="content">
+    <div class="summary-grid">
+      <div><div class="num">8</div><div class="label">Tables removed</div></div>
+      <div><div class="num">3</div><div class="label">Tables created</div></div>
+      <div><div class="num">4</div><div class="label">Modules deleted</div></div>
+    </div>
+
+    <h3>Schema</h3>
+    <pre style="font-size:10px;">clients (id, name, vault_name, slug, is_active, webhooks, thresholds, timestamps)
+usage_checks (id, client_id, provider, balance, spend, status, error)
+notification_log (id, client_id, channel, message, status)</pre>
+
+    <h3>Endpoints</h3>
+    <div class="endpoints">
+      <div class="ep"><span class="ep-method">GET</span><span class="ep-path">/api/health</span><span class="ep-desc">DB health check</span></div>
+    </div>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">Terminal</div>
+      <pre>curl -s http://localhost:3000/api/health
+# → {"status":"ok","database":"connected"}
+
+psql "$DATABASE_URL" -c "\dt"
+# → clients, usage_checks, notification_log (only 3)</pre>
+    </div>
+
+    <h3>Deleted</h3>
+    <ul>
+      <li><code>src/db/encryption.ts</code> — no more AES key storage</li>
+      <li><code>src/server/auth.ts</code> — no Clerk</li>
+      <li><code>src/server/oauth/</code> — no Google OAuth</li>
+      <li><code>src/server/routes/{keys,oauth,usage}.ts</code> — old API</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════ SLICE 2 ════════════════════ -->
+<div class="page" id="s2">
+  <span class="pill-num">02</span>
+  <h2>Client registry API</h2>
+  <p class="subtitle">CRUD operations for clients. <code>syncFromDiscovery</code> for 1Password reconciliation.</p>
+
+  <div class="content">
+    <h3>Module</h3>
+    <pre>clientRegistry.listClients()
+clientRegistry.getClient(id)
+clientRegistry.createClient(data)
+clientRegistry.updateClient(id, data)
+clientRegistry.deactivateClient(id)
+clientRegistry.activateClient(id)
+clientRegistry.syncFromDiscovery(discovered[])</pre>
+
+    <h3>Endpoints</h3>
+    <div class="endpoints">
+      <div class="ep"><span class="ep-method">GET</span><span class="ep-path">/api/clients</span><span class="ep-desc">All clients with latest check status</span></div>
+    </div>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">Terminal</div>
+      <pre>curl -s http://localhost:3000/api/clients | jq '.clients | length'
+# → number of clients (use jq or python3 -m json.tool)
+
+psql "$DATABASE_URL" -c "
+INSERT INTO clients (name, vault_name, slug)
+VALUES ('Demo', 'demo-vault', 'demo') RETURNING id;"
+# → client created
+
+curl -s http://localhost:3000/api/clients | jq '.clients[0].name'
+# → "Demo"</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLICE 3 ════════════════════ -->
+<div class="page" id="s3">
+  <span class="pill-num">03</span>
+  <h2>Manual provider check via env var</h2>
+  <p class="subtitle">Run provider checks using env vars. Store results in DB. Usage history queries.</p>
+
+  <div class="content">
+    <h3>Module</h3>
+    <pre>usageStore.insertCheck(data)        — store single check
+usageStore.insertChecks(data[])     — batch insert
+usageStore.getLatestCheck(clientId, provider)
+usageStore.getLatestChecks(clientId)
+usageStore.getCheckHistory(clientId, limit=50)</pre>
+
+    <h3>Endpoints</h3>
+    <div class="endpoints">
+      <div class="ep"><span class="ep-method">POST</span><span class="ep-path">/api/check</span><span class="ep-desc">Run checks for all active clients (env vars)</span></div>
+      <div class="ep"><span class="ep-method">GET</span><span class="ep-path">/api/clients/:id/usage</span><span class="ep-desc">Check history for a client</span></div>
+    </div>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">Terminal</div>
+      <pre>curl -s -X POST http://localhost:3000/api/check | jq '.summary'
+# → {"total":14,"succeeded":1,"failed":13}
+
+CLIENT=$(curl -s http://localhost:3000/api/clients | \
+  jq -r '.clients[0].id')
+curl -s "http://localhost:3000/api/clients/$CLIENT/usage" | \
+  jq '.checks | length'
+# → number of stored check results</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLICE 4 ════════════════════ -->
+<div class="page" id="s4">
+  <span class="pill-num">04</span>
+  <h2>1Password auto-discovery</h2>
+  <p class="subtitle">Read thefocus vault, discover client SAs, find API keys. Injectable op CLI runner.</p>
+
+  <div class="content">
+    <h3>Flow</h3>
+    <pre>OP_SERVICE_ACCOUNT_TOKEN → op item list --vault thefocus
+  → find API_CREDENTIAL items named "* service account token"
+  → for each: op item get → extract credential + vault fields
+  → for each client vault: op item list → match known env vars
+  → return [{ name, vaultName, slug, serviceAccountToken, keys }]</pre>
+
+    <h3>Endpoints</h3>
+    <div class="endpoints">
+      <div class="ep"><span class="ep-method">POST</span><span class="ep-path">/api/sync</span><span class="ep-desc">Run discovery + sync to DB</span></div>
+    </div>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">No 1Password? Mock test:</div>
+      <pre>unset OP_SERVICE_ACCOUNT_TOKEN
+curl -s -X POST http://localhost:3000/api/sync | jq '.error'
+# → "OP_SERVICE_ACCOUNT_TOKEN not set"
+
+# With a real token:
+export OP_SERVICE_ACCOUNT_TOKEN="ops_..."
+curl -s -X POST http://localhost:3000/api/sync | jq '.clients | length'
+# → number of discovered clients</pre>
+    </div>
+
+    <h3>Providers mapped</h3>
+    <pre>openrouter→OPENROUTER_API_KEY  openai→OPENAI_API_KEY
+claude→ANTHROPIC_API_KEY      google→GOOGLE_API_KEY
+groq→GROQ_API_KEY              perplexity→PERPLEXITY_API_KEY
+... 14 total</pre>
+  </div>
+</div>
+
+<!-- ════════════════════ SLICE 5 ════════════════════ -->
+<div class="page" id="s5">
+  <span class="pill-num">05</span>
+  <h2>Full auto-cycle + notifications</h2>
+  <p class="subtitle">Discovery → check → store → notify. Per-client thresholds. Cron scheduler.</p>
+
+  <div class="content">
+    <h3>Cycle</h3>
+    <pre>runFullCycle():
+  1. runDiscovery()            — 1Password or env var fallback
+  2. syncFromDiscovery()       — upsert clients in DB
+  3. checkClientKeys(keys)     — run all 14 providers
+  4. store results in DB       — usage_checks table
+  5. processNotifications()    — evaluate thresholds, send
+  6. writeStatusFile()         — atomic JSON output</pre>
+
+    <h3>Notification thresholds</h3>
+    <pre>balance ≤ threshold_critical → 🚨 CRITICAL
+balance ≤ threshold_warning  → ⚠️ WARNING
+check failed                 → ❌ ERROR
+else                         → ✅ healthy (no notification)</pre>
+
+    <h3>Endpoints</h3>
+    <div class="endpoints">
+      <div class="ep"><span class="ep-method">POST</span><span class="ep-path">/api/full-cycle</span><span class="ep-desc">Run full cycle manually</span></div>
+    </div>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">Terminal</div>
+      <pre>curl -s -X POST http://localhost:3000/api/full-cycle | \
+  jq '{status, summary}'
+# → {"status":"ok","summary":{"total":14,...}}
+
+psql "$DATABASE_URL" -c \
+  "SELECT channel, status, message FROM notification_log \
+   ORDER BY sent_at DESC LIMIT 3;"</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLICE 6 ════════════════════ -->
+<div class="page" id="s6">
+  <span class="pill-num">06</span>
+  <h2>Dashboard UI</h2>
+  <p class="subtitle">React SPA. Client list with drill-down. No auth. No key management.</p>
+
+  <div class="content">
+    <h3>Views</h3>
+    <pre>Client List:     Name · Status dot · Last Checked
+                 Click row → drill down
+
+Client Detail:   ← Back button
+                 Latest per-provider checks (balance, spend, status)
+                 Check history table (reverse chronological)</pre>
+
+    <h3>Stack</h3>
+    <ul>
+      <li>React 19 + Vite + Tailwind 4</li>
+      <li>Served by Fastify via <code>@fastify/static</code></li>
+      <li>SPA fallback serves <code>index.html</code> for unmatched routes</li>
+      <li>No localStorage auth tokens</li>
+    </ul>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">Browser</div>
+      <pre>open http://localhost:3000
+# → Hero: "USAGE MONITOR" with Labs branding
+# → Client list with status indicators
+# → Click client → drill into per-provider detail
+# → Click "← Back" → return to list
+# → Click "Run Checks" → trigger check cycle</pre>
+    </div>
+    <div class="cmd-block">
+      <div class="cmd-label">Build</div>
+      <pre>cd src/server/dashboard && pnpm build
+# → vite build complete, no errors</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLICE 7 ════════════════════ -->
+<div class="page" id="s7">
+  <span class="pill-num">07</span>
+  <h2>Status file output</h2>
+  <p class="subtitle">Atomic JSON status file after each check cycle. Consumable by pi agent skills.</p>
+
+  <div class="content">
+    <h3>File format</h3>
+    <pre>{
+  "checkedAt": "2026-05-15T03:00:00Z",
+  "clients": [{
+    "name": "Acme Corp",
+    "slug": "acme-corp",
+    "keys": [{
+      "provider": "openai",
+      "status": "success",
+      "balance": 45.23,
+      "spend": 12.50,
+      "lastChecked": "2026-05-15T03:00:00Z"
+    }]
+  }],
+  "summary": {
+    "totalKeys": 12,
+    "healthy": 10,
+    "errors": 2,
+    "critical": 1
+  }
+}</pre>
+
+    <h3>Config</h3>
+    <pre>STATUS_OUTPUT_PATH=/path/to/status.json   # default: ~/.usage-monitor/status.json
+Atomic write: write to .tmp → rename (no partial reads)
+Auto-creates directories if missing</pre>
+
+    <h3>Validate</h3>
+    <div class="cmd-block">
+      <div class="cmd-label">Terminal</div>
+      <pre>cat ~/.usage-monitor/status.json | jq '.summary'
+# → {"totalKeys":14,"healthy":1,"errors":13,"critical":0}
+
+export STATUS_OUTPUT_PATH="/tmp/test-status.json"
+curl -s -X POST http://localhost:3000/api/check > /dev/null
+cat /tmp/test-status.json | jq '.checkedAt'
+# → "2026-05-..."</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ NAVIGATION ════════════════════ -->
+<div class="nav-dots" id="dots">
+  <a href="#cover"></a>
+  <a href="#s1"></a>
+  <a href="#s2"></a>
+  <a href="#s3"></a>
+  <a href="#s4"></a>
+  <a href="#s5"></a>
+  <a href="#s6"></a>
+  <a href="#s7"></a>
+</div>
+
+<div class="hint">← → navigate</div>
+
+<div class="nav-arrows">
+  <a href="#" id="prev" style="display:none;">←</a>
+  <a href="#s1" id="next">→</a>
+</div>
+
+<script>
+  const pages = ['cover','s1','s2','s3','s4','s5','s6','s7'];
+  const dots = document.querySelectorAll('#dots a');
+  const body = document.body;
+
+  function updateNav() {
+    const scrollLeft = body.scrollLeft;
+    const w = window.innerWidth;
+    const idx = Math.round(scrollLeft / w);
+
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx + 1));
+
+    const prev = document.getElementById('prev');
+    const next = document.getElementById('next');
+    prev.style.display = idx === 0 ? 'none' : 'flex';
+    prev.href = '#' + pages[idx - 1];
+    next.style.display = idx === pages.length - 1 ? 'none' : 'flex';
+    next.href = '#' + pages[idx + 1];
+  }
+
+  body.addEventListener('scroll', updateNav);
+  window.addEventListener('resize', updateNav);
+  updateNav();
+
+  // keyboard
+  document.addEventListener('keydown', (e) => {
+    const idx = pages.indexOf(location.hash.slice(1));
+    if (e.key === 'ArrowRight' && idx < pages.length - 1)
+      location.hash = '#' + pages[idx + 1];
+    if (e.key === 'ArrowLeft' && idx > 0)
+      location.hash = '#' + pages[idx - 1];
+  });
+</script>
+
+</body>
+</html>
