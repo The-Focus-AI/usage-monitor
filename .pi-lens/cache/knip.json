@@ -63,16 +63,6 @@
     },
     {
       "type": "file",
-      "name": "src/server/dashboard/src/components/AddKeyForm.tsx",
-      "file": "src/server/dashboard/src/components/AddKeyForm.tsx"
-    },
-    {
-      "type": "file",
-      "name": "src/server/dashboard/src/components/KeyList.tsx",
-      "file": "src/server/dashboard/src/components/KeyList.tsx"
-    },
-    {
-      "type": "file",
       "name": "src/server/dashboard/src/components/UsageHistory.tsx",
       "file": "src/server/dashboard/src/components/UsageHistory.tsx"
     },
@@ -181,12 +171,6 @@
       "name": "@fastify/cors",
       "file": "package.json",
       "line": 32
-    },
-    {
-      "type": "dependency",
-      "name": "@fastify/static",
-      "file": "package.json",
-      "line": 33
     },
     {
       "type": "dependency",
@@ -535,16 +519,6 @@
     },
     {
       "type": "file",
-      "name": "src/server/dashboard/src/components/AddKeyForm.tsx",
-      "file": "src/server/dashboard/src/components/AddKeyForm.tsx"
-    },
-    {
-      "type": "file",
-      "name": "src/server/dashboard/src/components/KeyList.tsx",
-      "file": "src/server/dashboard/src/components/KeyList.tsx"
-    },
-    {
-      "type": "file",
       "name": "src/server/dashboard/src/components/UsageHistory.tsx",
       "file": "src/server/dashboard/src/components/UsageHistory.tsx"
     },
@@ -658,12 +632,6 @@
     },
     {
       "type": "dependency",
-      "name": "@fastify/static",
-      "file": "package.json",
-      "line": 33
-    },
-    {
-      "type": "dependency",
       "name": "ink-search-select",
       "file": "package.json",
       "line": 38
@@ -682,5 +650,5 @@
       "file": "vitest.config.ts"
     }
   ],
-  "summary": "Found 62 issues"
+  "summary": "Found 59 issues"
 }

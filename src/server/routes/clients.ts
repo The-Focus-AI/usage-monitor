@@ -148,7 +148,12 @@ export const clientRoutes: FastifyPluginAsync = async (server) => {
 					slug: c.slug,
 					isActive: c.isActive,
 				})),
-				summary: { total: results.length, succeeded, failed, clientCount: clients.length },
+				summary: {
+					total: results.length,
+					succeeded,
+					failed,
+					clientCount: clients.length,
+				},
 			});
 		} catch (error) {
 			_request.log.error(error, "Full cycle failed");

@@ -61,19 +61,21 @@ describe("Slice 1: New schema + server boots clean", () => {
 		expect(body.database).toBeDefined();
 	});
 
-	it("server does not expose old routes", async () => {
+	it("old API routes are removed (SPA fallback serves HTML, not JSON)", async () => {
 		const { buildServer } = await import("../server/index.js");
 		server = await buildServer();
 		await server.ready();
 
-		// These old routes should return 404
+		// These old routes should NOT return JSON API responses anymore.
+		// They now hit the SPA fallback which returns HTML.
 		const oldRoutes = ["/api/keys", "/api/usage", "/api/oauth/google/start"];
 		for (const route of oldRoutes) {
 			const response = await server.inject({
 				method: "GET",
 				url: route,
 			});
-			expect(response.statusCode).toBe(404);
+			// Should not return JSON — the old route handlers are gone
+			expect(response.headers["content-type"]).toContain("text/html");
 		}
 	});
 

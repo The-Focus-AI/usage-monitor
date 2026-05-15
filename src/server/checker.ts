@@ -73,8 +73,7 @@ async function storeCheckResult(result: CheckResult): Promise<void> {
 				result.usage?.totalCost?.toString() ??
 				result.billing?.monthlySpend?.toString() ??
 				null,
-			limitRemaining:
-				result.billing?.usageLimits?.monthly?.toString() ?? null,
+			limitRemaining: result.billing?.usageLimits?.monthly?.toString() ?? null,
 			errorMessage: result.error ?? null,
 			rawResponse: result.usage ?? null,
 		});
@@ -98,7 +97,9 @@ export async function checkClientKeys(
 ): Promise<CheckResult[]> {
 	if (keys.length === 0) return [];
 
-	const promises = keys.map((key) => checkProvider(clientId, key.provider, key.value));
+	const promises = keys.map((key) =>
+		checkProvider(clientId, key.provider, key.value),
+	);
 	const settled = await Promise.allSettled(promises);
 
 	const results: CheckResult[] = [];

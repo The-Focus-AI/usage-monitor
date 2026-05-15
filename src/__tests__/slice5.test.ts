@@ -1,4 +1,13 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach, vi } from "vitest";
+import {
+	describe,
+	it,
+	expect,
+	beforeAll,
+	afterAll,
+	afterEach,
+	beforeEach,
+	vi,
+} from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { clients, usageChecks, notificationLog } from "../db/schema.js";
@@ -22,12 +31,16 @@ function makeTestClient(overrides?: Partial<NewClient>): NewClient {
 }
 
 async function cleanup() {
-	await db.delete(notificationLog).where(
-		sql`client_id IN (SELECT id FROM ${clients} WHERE name LIKE ${`${TEST_PREFIX}-%`})`,
-	);
-	await db.delete(usageChecks).where(
-		sql`client_id IN (SELECT id FROM ${clients} WHERE name LIKE ${`${TEST_PREFIX}-%`})`,
-	);
+	await db
+		.delete(notificationLog)
+		.where(
+			sql`client_id IN (SELECT id FROM ${clients} WHERE name LIKE ${`${TEST_PREFIX}-%`})`,
+		);
+	await db
+		.delete(usageChecks)
+		.where(
+			sql`client_id IN (SELECT id FROM ${clients} WHERE name LIKE ${`${TEST_PREFIX}-%`})`,
+		);
 	await db.delete(clients).where(sql`name LIKE ${`${TEST_PREFIX}-%`}`);
 }
 
@@ -44,7 +57,10 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 
 	afterEach(async () => {
 		for (const id of clientIds) {
-			await db.delete(clients).where(eq(clients.id, id)).catch(() => {});
+			await db
+				.delete(clients)
+				.where(eq(clients.id, id))
+				.catch(() => {});
 		}
 		clientIds = [];
 	});
@@ -53,7 +69,10 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 		let testClientId: string;
 
 		beforeEach(async () => {
-			const [c] = await db.insert(clients).values(makeTestClient()).returning({ id: clients.id });
+			const [c] = await db
+				.insert(clients)
+				.values(makeTestClient())
+				.returning({ id: clients.id });
 			testClientId = c!.id;
 			clientIds.push(testClientId);
 		});
@@ -63,12 +82,18 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 
 			const results = await checkClientKeys(testClientId, [
 				{ provider: "openai", envVarName: "OPENAI_API_KEY", value: "sk-test" },
-				{ provider: "claude", envVarName: "ANTHROPIC_API_KEY", value: "sk-ant-test" },
+				{
+					provider: "claude",
+					envVarName: "ANTHROPIC_API_KEY",
+					value: "sk-ant-test",
+				},
 			]);
 
 			expect(results).toHaveLength(2);
 			// Both should fail auth since keys are fake — but they ran
-			expect(results.every((r) => r.status === "error" || r.status === "success")).toBe(true);
+			expect(
+				results.every((r) => r.status === "error" || r.status === "success"),
+			).toBe(true);
 			expect(results.every((r) => r.clientId === testClientId)).toBe(true);
 		}, 15000);
 
@@ -83,35 +108,44 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 		let testClientId: string;
 
 		beforeEach(async () => {
-			const [c] = await db.insert(clients).values(makeTestClient({
-				slackWebhook: "https://hooks.slack.com/test",
-				thresholdWarning: "50",
-				thresholdCritical: "10",
-			})).returning({ id: clients.id });
+			const [c] = await db
+				.insert(clients)
+				.values(
+					makeTestClient({
+						slackWebhook: "https://hooks.slack.com/test",
+						thresholdWarning: "50",
+						thresholdCritical: "10",
+					}),
+				)
+				.returning({ id: clients.id });
 			testClientId = c!.id;
 			clientIds.push(testClientId);
 		});
 
 		it("processNotifications sends for critical balance", async () => {
-			const { processNotifications } = await import("../server/notifications/index.js");
+			const { processNotifications } = await import(
+				"../server/notifications/index.js"
+			);
 
 			// Mock fetch so we don't actually hit Slack
 			const fetchMock = vi.fn().mockResolvedValue({ ok: true });
 			vi.stubGlobal("fetch", fetchMock);
 
-			const results: CheckResult[] = [{
-				clientId: testClientId,
-				provider: "openai",
-				status: "success",
-				usage: {
+			const results: CheckResult[] = [
+				{
+					clientId: testClientId,
 					provider: "openai",
-					totalTokens: 0,
-					totalCost: 0,
-					remainingBalance: 5,
-					billingPeriod: { start: "", end: "" },
-					lastUpdated: "",
+					status: "success",
+					usage: {
+						provider: "openai",
+						totalTokens: 0,
+						totalCost: 0,
+						remainingBalance: 5,
+						billingPeriod: { start: "", end: "" },
+						lastUpdated: "",
+					},
 				},
-			}];
+			];
 
 			await processNotifications(results);
 
@@ -119,7 +153,9 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 			expect(fetchMock).toHaveBeenCalled();
 
 			// Should have logged it
-			const logs = await db.select().from(notificationLog)
+			const logs = await db
+				.select()
+				.from(notificationLog)
 				.where(eq(notificationLog.clientId, testClientId));
 			expect(logs.length).toBeGreaterThanOrEqual(1);
 			expect(logs[0].channel).toBe("slack");
@@ -129,24 +165,28 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 		});
 
 		it("processNotifications does not send for healthy clients", async () => {
-			const { processNotifications } = await import("../server/notifications/index.js");
+			const { processNotifications } = await import(
+				"../server/notifications/index.js"
+			);
 
 			const fetchMock = vi.fn().mockResolvedValue({ ok: true });
 			vi.stubGlobal("fetch", fetchMock);
 
-			const results: CheckResult[] = [{
-				clientId: testClientId,
-				provider: "openai",
-				status: "success",
-				usage: {
+			const results: CheckResult[] = [
+				{
+					clientId: testClientId,
 					provider: "openai",
-					totalTokens: 0,
-					totalCost: 0,
-					remainingBalance: 500,
-					billingPeriod: { start: "", end: "" },
-					lastUpdated: "",
+					status: "success",
+					usage: {
+						provider: "openai",
+						totalTokens: 0,
+						totalCost: 0,
+						remainingBalance: 500,
+						billingPeriod: { start: "", end: "" },
+						lastUpdated: "",
+					},
 				},
-			}];
+			];
 
 			await processNotifications(results);
 
@@ -154,7 +194,9 @@ describe("Slice 5: Full auto-cycle + notifications", () => {
 			expect(fetchMock).not.toHaveBeenCalled();
 
 			// Clean up any accidental logs
-			await db.delete(notificationLog).where(eq(notificationLog.clientId, testClientId));
+			await db
+				.delete(notificationLog)
+				.where(eq(notificationLog.clientId, testClientId));
 
 			vi.unstubAllGlobals();
 		});

@@ -69,9 +69,7 @@ async function processClientNotifications(
 	const sends: Array<Promise<void>> = [];
 
 	if (client.slackWebhook) {
-		sends.push(
-			sendAndLog(client.id, "slack", client.slackWebhook, payload),
-		);
+		sends.push(sendAndLog(client.id, "slack", client.slackWebhook, payload));
 	}
 	if (client.discordWebhook) {
 		sends.push(
@@ -79,9 +77,7 @@ async function processClientNotifications(
 		);
 	}
 	if (client.email) {
-		sends.push(
-			sendAndLog(client.id, "email", client.email, payload),
-		);
+		sends.push(sendAndLog(client.id, "email", client.email, payload));
 	}
 
 	await Promise.allSettled(sends);
@@ -111,9 +107,7 @@ function evaluateThresholds(
 		}
 
 		const balance =
-			r.usage?.remainingBalance ??
-			r.billing?.currentBalance ??
-			null;
+			r.usage?.remainingBalance ?? r.billing?.currentBalance ?? null;
 
 		if (balance !== null && critical !== null && balance <= critical) {
 			hasCritical = true;
@@ -192,8 +186,7 @@ async function sendAndLog(
 			channel: channel as "slack" | "discord" | "email",
 			message: payload.text,
 			status: "failed",
-			errorMessage:
-				error instanceof Error ? error.message : "Unknown error",
+			errorMessage: error instanceof Error ? error.message : "Unknown error",
 		});
 	}
 }
