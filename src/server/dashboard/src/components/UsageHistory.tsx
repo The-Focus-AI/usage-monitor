@@ -19,8 +19,7 @@ export function UsageHistory({ checks }: Props) {
 	}
 
 	const sorted = [...checks].sort(
-		(a, b) =>
-			new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime(),
+		(a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime(),
 	);
 
 	return (

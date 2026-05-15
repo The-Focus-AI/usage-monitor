@@ -2405,7 +2405,32 @@
         }
       ],
       "trend": "stable"
+    },
+    "src/server/status-output.ts": {
+      "latest": {
+        "commit": "a9d4025",
+        "timestamp": "2026-05-15T03:57:51.428Z",
+        "mi": 36.8,
+        "cognitive": 26,
+        "nesting": 6,
+        "lines": 129,
+        "maxCyclomatic": 14,
+        "entropy": 6.43
+      },
+      "history": [
+        {
+          "commit": "a9d4025",
+          "timestamp": "2026-05-15T03:57:51.428Z",
+          "mi": 36.8,
+          "cognitive": 26,
+          "nesting": 6,
+          "lines": 129,
+          "maxCyclomatic": 14,
+          "entropy": 6.43
+        }
+      ],
+      "trend": "stable"
     }
   },
-  "capturedAt": "2026-05-15T03:40:14.367Z"
+  "capturedAt": "2026-05-15T03:57:56.429Z"
 }

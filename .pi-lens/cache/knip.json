@@ -283,13 +283,37 @@
       "type": "export",
       "name": "stopScheduler",
       "file": "src/server/scheduler.ts",
-      "line": 97
+      "line": 101
     },
     {
       "type": "export",
       "name": "runManualCheck",
       "file": "src/server/scheduler.ts",
-      "line": 108
+      "line": 112
+    },
+    {
+      "type": "export",
+      "name": "statusOutput",
+      "file": "src/server/status-output.ts",
+      "line": 161
+    },
+    {
+      "type": "export",
+      "name": "StatusKeyEntry",
+      "file": "src/server/status-output.ts",
+      "line": 10
+    },
+    {
+      "type": "export",
+      "name": "StatusClientEntry",
+      "file": "src/server/status-output.ts",
+      "line": 19
+    },
+    {
+      "type": "export",
+      "name": "StatusFile",
+      "file": "src/server/status-output.ts",
+      "line": 25
     },
     {
       "type": "export",
@@ -417,13 +441,37 @@
       "type": "export",
       "name": "stopScheduler",
       "file": "src/server/scheduler.ts",
-      "line": 97
+      "line": 101
     },
     {
       "type": "export",
       "name": "runManualCheck",
       "file": "src/server/scheduler.ts",
-      "line": 108
+      "line": 112
+    },
+    {
+      "type": "export",
+      "name": "statusOutput",
+      "file": "src/server/status-output.ts",
+      "line": 161
+    },
+    {
+      "type": "export",
+      "name": "StatusKeyEntry",
+      "file": "src/server/status-output.ts",
+      "line": 10
+    },
+    {
+      "type": "export",
+      "name": "StatusClientEntry",
+      "file": "src/server/status-output.ts",
+      "line": 19
+    },
+    {
+      "type": "export",
+      "name": "StatusFile",
+      "file": "src/server/status-output.ts",
+      "line": 25
     },
     {
       "type": "export",
@@ -650,5 +698,5 @@
       "file": "vitest.config.ts"
     }
   ],
-  "summary": "Found 59 issues"
+  "summary": "Found 63 issues"
 }

@@ -54,8 +54,8 @@ function ClientList({
 								client.lastCheckStatus === "success"
 									? "bg-[#0055aa]"
 									: client.lastCheckStatus === "error"
-									? "bg-[#d93025]"
-									: "bg-[#1a1a1a]/20"
+										? "bg-[#d93025]"
+										: "bg-[#1a1a1a]/20"
 							}`}
 						/>
 						<div className="flex-1 min-w-0">
@@ -72,8 +72,8 @@ function ClientList({
 									client.lastCheckStatus === "success"
 										? "bg-[#0055aa]/10 text-[#0055aa] border-[#0055aa]/30"
 										: client.lastCheckStatus === "error"
-										? "bg-[#d93025]/10 text-[#d93025] border-[#d93025]/30"
-										: "bg-[#1a1a1a]/5 text-[#1a1a1a]/30 border-[#1a1a1a]/10"
+											? "bg-[#d93025]/10 text-[#d93025] border-[#d93025]/30"
+											: "bg-[#1a1a1a]/5 text-[#1a1a1a]/30 border-[#1a1a1a]/10"
 								}`}
 							>
 								{statusSummary(client)}
@@ -106,10 +106,7 @@ function ClientDetail({
 	const latestByProvider = new Map<string, UsageCheck>();
 	for (const check of checks) {
 		const existing = latestByProvider.get(check.provider);
-		if (
-			!existing ||
-			new Date(check.checkedAt) > new Date(existing.checkedAt)
-		) {
+		if (!existing || new Date(check.checkedAt) > new Date(existing.checkedAt)) {
 			latestByProvider.set(check.provider, check);
 		}
 	}
@@ -119,8 +116,7 @@ function ClientDetail({
 	);
 
 	const sortedChecks = [...checks].sort(
-		(a, b) =>
-			new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime(),
+		(a, b) => new Date(b.checkedAt).getTime() - new Date(a.checkedAt).getTime(),
 	);
 
 	return (
@@ -155,9 +151,7 @@ function ClientDetail({
 							<div className="flex items-center gap-4">
 								<div
 									className={`w-3 h-3 flex-shrink-0 ${
-										check.status === "success"
-											? "bg-[#0055aa]"
-											: "bg-[#d93025]"
+										check.status === "success" ? "bg-[#0055aa]" : "bg-[#d93025]"
 									}`}
 								/>
 								<div className="flex-1 min-w-0">
@@ -183,8 +177,8 @@ function ClientDetail({
 											</span>
 											{check.spend && Number(check.spend) > 0 && (
 												<span>
-													<span className="text-[#1a1a1a]/40">SPEND:</span>{" "}
-													${Number(check.spend).toFixed(2)}
+													<span className="text-[#1a1a1a]/40">SPEND:</span> $
+													{Number(check.spend).toFixed(2)}
 												</span>
 											)}
 										</div>
@@ -347,12 +341,14 @@ export function App() {
 					</div>
 
 					<h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-[#1a1a1a] leading-[0.85] tracking-tight mb-6 md:mb-8">
-						USAGE<br />
+						USAGE
+						<br />
 						<span className="text-[#0055aa]">MONITOR</span>
 					</h1>
 
 					<p className="text-base md:text-lg font-normal max-w-2xl leading-snug border-l-4 border-[#d93025] pl-6 py-2 text-[#1a1a1a]/80">
-						Track API usage, balances, and spend across all clients and providers.
+						Track API usage, balances, and spend across all clients and
+						providers.
 					</p>
 				</header>
 

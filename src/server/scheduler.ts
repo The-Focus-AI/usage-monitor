@@ -6,6 +6,7 @@ import { clientRegistry } from "./client-registry.js";
 import { checkClientKeys } from "./checker.js";
 import type { CheckResult } from "./checker.js";
 import { processNotifications } from "./notifications/index.js";
+import { writeStatusFile } from "./status-output.js";
 
 type ScheduledTask = ReturnType<typeof cron.schedule>;
 
@@ -34,6 +35,7 @@ export async function runFullCycle(): Promise<FullCycleResult> {
 
 		const syncedClients = await clientRegistry.listClients();
 		await processNotifications(results);
+		await writeStatusFile();
 
 		return { results, clients: syncedClients };
 	}
@@ -58,6 +60,8 @@ export async function runFullCycle(): Promise<FullCycleResult> {
 
 	// Send notifications
 	await processNotifications(allResults);
+	// Write status file
+	await writeStatusFile();
 
 	console.log(
 		`[cycle] Complete: ${allResults.filter((r) => r.status === "success").length} ok, ${allResults.filter((r) => r.status === "error").length} failed across ${syncedClients.length} clients`,
