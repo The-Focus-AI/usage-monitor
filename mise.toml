@@ -38,6 +38,11 @@ description = 'Check OpenRouter balance without posting to Slack (dry run)'
 run = 'SLACK_WEBHOOK_URL="" node scripts/check-balance.mjs'
 depends = ['pnpm-install']
 
+[tasks.server]
+description = 'Start the usage monitor API server (port 3000)'
+run = 'tsx src/server/main.ts'
+depends = ['pnpm-install']
+
 [tasks.test]
 description = 'Run the usage monitor locally for testing'
 run = 'node scripts/check-balance.mjs'
