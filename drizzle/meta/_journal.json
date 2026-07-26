@@ -8,6 +8,13 @@
       "when": 1778778671539,
       "tag": "0000_serious_sunspot",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1778936914201,
+      "tag": "0001_pink_doctor_faustus",
+      "breakpoints": true
     }
   ]
 }

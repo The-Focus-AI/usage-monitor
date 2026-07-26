@@ -2,7 +2,7 @@
 import { describe, it, expect, beforeAll, afterAll, afterEach } from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { clients } from "../db/schema.js";
+import { clientKeyInventory, clients } from "../db/schema.js";
 import { buildServer } from "../server/index.js";
 import type { FastifyInstance } from "fastify";
 
@@ -68,6 +68,19 @@ const MOCK_CLIENT_A_ITEMS = [
 				id: "password",
 				label: "password",
 				value: "sk-ant-xyz789",
+				purpose: null,
+			},
+		],
+	},
+	{
+		id: "key-gemini-alias",
+		title: "Gemini API Key",
+		category: "API_CREDENTIAL",
+		fields: [
+			{
+				id: "credential",
+				label: "credential",
+				value: "gemini-key-123",
 				purpose: null,
 			},
 		],
@@ -221,6 +234,43 @@ describe("Slice 4: 1Password auto-discovery", () => {
 			expect(result).toHaveLength(2);
 		});
 
+		it("handles 1Password custom field ids by matching the vault field label", async () => {
+			process.env.OP_SERVICE_ACCOUNT_TOKEN = "ops_master";
+
+			const itemWithCustomVaultFieldId = {
+				id: "sa-client-custom-field",
+				title: "client-custom-field service account token",
+				category: "API_CREDENTIAL",
+				fields: [
+					{
+						id: "credential",
+						label: "credential",
+						value: "ops_client_custom_field_token",
+						purpose: null,
+					},
+					{
+						id: "generated-field-id",
+						label: "vault",
+						value: "client-custom-field-vault",
+						purpose: null,
+					},
+				],
+			};
+
+			mockOpRunner({
+				"item list --vault thefocus --format json": [
+					itemWithCustomVaultFieldId,
+				],
+				"item get sa-client-custom-field --vault thefocus --format json":
+					itemWithCustomVaultFieldId,
+			});
+
+			const result = await opDiscovery.discoverClients();
+
+			expect(result).toHaveLength(1);
+			expect(result[0]!.vaultName).toBe("client-custom-field-vault");
+		});
+
 		it("handles empty vault gracefully", async () => {
 			process.env.OP_SERVICE_ACCOUNT_TOKEN = "ops_master";
 
@@ -241,7 +291,7 @@ describe("Slice 4: 1Password auto-discovery", () => {
 					MOCK_CLIENT_A_ITEMS[0],
 				"item get key-claude --vault client-a-vault --format json":
 					MOCK_CLIENT_A_ITEMS[1],
-				"item get not-a-key --vault client-a-vault --format json":
+				"item get key-gemini-alias --vault client-a-vault --format json":
 					MOCK_CLIENT_A_ITEMS[2],
 			});
 
@@ -250,7 +300,7 @@ describe("Slice 4: 1Password auto-discovery", () => {
 				"client-a-vault",
 			);
 
-			expect(result).toHaveLength(2);
+			expect(result).toHaveLength(3);
 
 			expect(result[0].provider).toBe("openai");
 			expect(result[0].envVarName).toBe("OPENAI_API_KEY");
@@ -259,6 +309,10 @@ describe("Slice 4: 1Password auto-discovery", () => {
 			expect(result[1].provider).toBe("claude");
 			expect(result[1].envVarName).toBe("ANTHROPIC_API_KEY");
 			expect(result[1].value).toBe("sk-ant-xyz789");
+
+			expect(result[2].provider).toBe("google");
+			expect(result[2].envVarName).toBe("Gemini API Key");
+			expect(result[2].value).toBe("gemini-key-123");
 		});
 
 		it("filters out items not matching known env vars", async () => {
@@ -320,7 +374,7 @@ describe("Slice 4: 1Password auto-discovery", () => {
 					MOCK_CLIENT_A_ITEMS[0],
 				"item get key-claude --vault client-a-vault --format json":
 					MOCK_CLIENT_A_ITEMS[1],
-				"item get not-a-key --vault client-a-vault --format json":
+				"item get key-gemini-alias --vault client-a-vault --format json":
 					MOCK_CLIENT_A_ITEMS[2],
 				"item list --vault client-b-vault --format json": MOCK_CLIENT_B_ITEMS,
 				"item get key-google --vault client-b-vault --format json":
@@ -331,18 +385,153 @@ describe("Slice 4: 1Password auto-discovery", () => {
 
 			expect(result).toHaveLength(2);
 
-			// Client A has 2 keys (openai, claude)
+			// Client A has 3 keys (openai, claude, google alias)
 			const clientA = result.find((c) => c.slug === "client-a");
 			expect(clientA).toBeDefined();
-			expect(clientA!.keys).toHaveLength(2);
+			expect(clientA!.keys).toHaveLength(3);
 			expect(clientA!.keys[0].provider).toBe("openai");
 			expect(clientA!.keys[1].provider).toBe("claude");
+			expect(clientA!.keys[2].provider).toBe("google");
 
 			// Client B has 1 key (google)
 			const clientB = result.find((c) => c.slug === "client-b");
 			expect(clientB).toBeDefined();
 			expect(clientB!.keys).toHaveLength(1);
 			expect(clientB!.keys[0].provider).toBe("google");
+		});
+	});
+
+	describe("key inventory preview endpoints", () => {
+		const OLD_ENV = process.env;
+
+		beforeAll(async () => {
+			await db
+				.delete(clientKeyInventory)
+				.where(
+					sql`client_id IN (SELECT id FROM ${clients} WHERE slug = 'client-a')`,
+				);
+			await db.delete(clients).where(eq(clients.slug, "client-a"));
+		});
+
+		afterEach(() => {
+			process.env = { ...OLD_ENV };
+		});
+
+		afterAll(async () => {
+			await db
+				.delete(clientKeyInventory)
+				.where(
+					sql`client_id IN (SELECT id FROM ${clients} WHERE slug = 'client-a')`,
+				);
+			await db.delete(clients).where(eq(clients.slug, "client-a"));
+		});
+
+		it("refreshes cached inventory from 1Password, then GET serves it from the database", async () => {
+			process.env.OP_SERVICE_ACCOUNT_TOKEN = "ops_master_preview";
+
+			mockOpRunner({
+				"item list --vault thefocus --format json": [MOCK_VAULT_ITEMS[0]],
+				"item get sa-client-a --vault thefocus --format json":
+					MOCK_VAULT_ITEMS[0],
+				"item list --vault client-a-vault --format json": MOCK_CLIENT_A_ITEMS,
+			});
+
+			const refreshResponse = await server.inject({
+				method: "POST",
+				url: "/api/discovery-preview/refresh",
+			});
+
+			expect(refreshResponse.statusCode).toBe(200);
+			expect(refreshResponse.body).not.toContain("sk-openai-abc123");
+			expect(refreshResponse.body).not.toContain("sk-ant-xyz789");
+			expect(refreshResponse.body).not.toContain("gemini-key-123");
+
+			// GET should read cached DB inventory and should not call 1Password.
+			opDiscovery.setOpRunner(() => {
+				throw new Error("GET should not call op");
+			});
+
+			const response = await server.inject({
+				method: "GET",
+				url: "/api/discovery-preview",
+			});
+
+			expect(response.statusCode).toBe(200);
+			const body = JSON.parse(response.body);
+			const clientA = body.clients.find(
+				(c: { slug: string }) => c.slug === "client-a",
+			);
+			expect(clientA).toMatchObject({
+				name: "client-a",
+				vaultName: "client-a-vault",
+				slug: "client-a",
+			});
+			expect(clientA.keys).toEqual([
+				{
+					itemName: "ANTHROPIC_API_KEY",
+					category: "PASSWORD",
+					provider: "claude",
+					checker: "claude",
+					monitored: true,
+					lastDiscoveredAt: expect.any(String),
+				},
+				{
+					itemName: "Gemini API Key",
+					category: "API_CREDENTIAL",
+					provider: "google",
+					checker: "google",
+					monitored: true,
+					lastDiscoveredAt: expect.any(String),
+				},
+				{
+					itemName: "OPENAI_API_KEY",
+					category: "PASSWORD",
+					provider: "openai",
+					checker: "openai",
+					monitored: true,
+					lastDiscoveredAt: expect.any(String),
+				},
+				{
+					itemName: "AWS_SECRET_KEY",
+					category: "PASSWORD",
+					provider: null,
+					checker: null,
+					monitored: false,
+					lastDiscoveredAt: expect.any(String),
+				},
+			]);
+			expect(response.body).not.toContain("sk-openai-abc123");
+			expect(response.body).not.toContain("sk-ant-xyz789");
+			expect(response.body).not.toContain("gemini-key-123");
+		});
+
+		it("dashboard GET endpoints never call 1Password", async () => {
+			opDiscovery.setOpRunner(() => {
+				throw new Error("GET endpoint should not call op");
+			});
+
+			const clientsResponse = await server.inject({
+				method: "GET",
+				url: "/api/clients",
+			});
+			const previewResponse = await server.inject({
+				method: "GET",
+				url: "/api/discovery-preview",
+			});
+
+			expect(clientsResponse.statusCode).toBe(200);
+			expect(previewResponse.statusCode).toBe(200);
+		});
+
+		it("refresh returns 503 when OP_SERVICE_ACCOUNT_TOKEN is missing", async () => {
+			delete process.env.OP_SERVICE_ACCOUNT_TOKEN;
+
+			const response = await server.inject({
+				method: "POST",
+				url: "/api/discovery-preview/refresh",
+			});
+
+			expect(response.statusCode).toBe(503);
 		});
 	});
 

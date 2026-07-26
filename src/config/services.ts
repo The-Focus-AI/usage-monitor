@@ -12,7 +12,7 @@ export const ServiceConfigSchema = z.object({
 			warning: z.number().positive().default(10),
 			critical: z.number().positive().default(5),
 		})
-		.default({}),
+		.default({ warning: 10, critical: 5 }),
 	vault: z.string().optional(), // 1Password vault name
 	itemTitle: z.string().optional(), // 1Password item title
 });

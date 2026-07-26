@@ -1,326 +1,995 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Usage Monitor — Validation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--black:#0a0a0a;--white:#f5f4f0;--paper:#efede8;--blue:#0055aa;--red:#d93025;--gray:#8a8a86;--light-gray:#c8c6c0;--green:#1a7f3a;--sans:'Inter','Helvetica Neue',Helvetica,Arial,sans-serif;--mono:'IBM Plex Mono','Courier New',monospace;--page-w:100vw;--page-h:100vh}
-html{font-family:var(--sans);background:var(--white);color:var(--black);scroll-behavior:smooth;overflow:hidden}
-body{display:flex;flex-direction:row;width:calc(var(--page-w)*10);height:var(--page-h)}
-.page{width:var(--page-w);height:var(--page-h);flex-shrink:0;overflow-y:auto;display:flex;flex-direction:column;position:relative;padding:48px 64px;border-right:1px solid var(--light-gray)}
-.page::-webkit-scrollbar{width:4px}
-.page::-webkit-scrollbar-thumb{background:var(--gray)}
-.cover{justify-content:center;background:var(--black);color:var(--white);border-right:none}
-.cover .accent-line{background:var(--white)}
-.cover .meta{color:var(--gray)}
-.accent-line{width:48px;height:4px;background:var(--blue);margin-bottom:24px}
-.meta{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);margin-bottom:4px}
-h1{font-size:clamp(48px,7vw,88px);font-weight:900;line-height:0.9;letter-spacing:-0.03em;margin-bottom:16px}
-h1 .highlight{color:var(--blue)}
-.cover h1 .highlight{color:var(--white);text-decoration:underline;text-decoration-color:var(--blue);text-underline-offset:8px}
-h2{font-size:32px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px}
-h3{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.15em;color:var(--blue);margin-bottom:4px;margin-top:16px}
-.subtitle{font-size:15px;line-height:1.5;color:var(--gray);max-width:540px;margin-bottom:32px}
-.pill{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;padding:4px 10px;border:1px solid var(--light-gray);margin-bottom:16px}
-.pill-num{background:var(--blue);color:var(--white);border:none;padding:4px 10px;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.1em;margin-bottom:16px;display:inline-block}
-.content{flex:1;display:flex;flex-direction:column;gap:8px;max-width:700px}
-.content p,.content li{font-size:13px;line-height:1.6;color:var(--black)}
-.content ul{padding-left:20px}
-.content li{margin-bottom:4px}
-.content strong{font-weight:600}
-code{font-family:var(--mono);font-size:11px;background:var(--paper);padding:1px 5px;border-radius:2px}
-pre{font-family:var(--mono);font-size:11px;line-height:1.5;background:var(--paper);padding:12px 16px;overflow-x:auto;border-radius:2px;margin:4px 0 8px}
-.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2px;margin:16px 0;border:1px solid var(--black)}
-.summary-grid>div{background:var(--paper);padding:16px 20px}
-.summary-grid .num{font-size:28px;font-weight:700;letter-spacing:-0.02em;line-height:1}
-.summary-grid .label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);margin-top:4px}
-.endpoints{display:flex;flex-direction:column;gap:2px;margin:8px 0}
-.ep{display:flex;gap:12px;font-family:var(--mono);font-size:11px;padding:6px 0;border-bottom:1px solid var(--light-gray)}
-.ep-method{font-weight:600;color:var(--blue);min-width:48px}
-.ep-path{flex:1}
-.ep-desc{color:var(--gray);flex:1}
-.verify{background:var(--green);color:#fff;padding:2px 8px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;border-radius:2px;display:inline-block;margin-right:6px}
-.verify-warn{background:#b8860b;color:#fff;padding:2px 8px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;border-radius:2px;display:inline-block;margin-right:6px}
-.verify-fail{background:var(--red);color:#fff;padding:2px 8px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.1em;border-radius:2px;display:inline-block;margin-right:6px}
-.cmd-block{margin:4px 0}
-.cmd-block pre{margin:0}
-.cmd-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gray);margin-bottom:4px}
-.result-row{display:flex;gap:8px;align-items:center;padding:4px 0;font-size:12px;font-family:var(--mono)}
-.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.status-dot.green{background:var(--green)}
-.status-dot.red{background:var(--red)}
-.status-dot.amber{background:#b8860b}
-.key-val{font-family:var(--mono);font-size:11px;background:var(--paper);padding:2px 6px;border-radius:2px}
-.nav-dots{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:100}
-.nav-dots a{display:block;width:10px;height:10px;border:1.5px solid var(--black);border-radius:50%;transition:background .2s}
-.nav-dots a:hover{background:var(--blue);border-color:var(--blue)}
-.nav-dots a.active{background:var(--black)}
-.nav-arrows{position:fixed;bottom:24px;right:32px;display:flex;gap:8px;z-index:100}
-.nav-arrows a{width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;border:1.5px solid var(--black);text-decoration:none;color:var(--black);transition:background .2s}
-.nav-arrows a:hover{background:var(--black);color:var(--white)}
-.hint{position:fixed;bottom:24px;left:32px;font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);z-index:100}
-.result-card{border:1px solid var(--black);padding:16px 20px;background:var(--white);margin:8px 0}
-.result-card .header{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.15em;color:var(--gray);margin-bottom:8px}
-@media(max-width:768px){.page{padding:24px 20px}h1{font-size:32px}h2{font-size:22px}.subtitle{font-size:13px}.summary-grid{grid-template-columns:1fr 1fr}.hint,.nav-arrows{display:none}}
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usage Monitor — Validation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --black: #0a0a0a;
+        --white: #f5f4f0;
+        --paper: #efede8;
+        --blue: #0055aa;
+        --red: #d93025;
+        --gray: #8a8a86;
+        --light-gray: #c8c6c0;
+        --green: #1a7f3a;
+        --sans: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --mono: "IBM Plex Mono", "Courier New", monospace;
+        --page-w: 100vw;
+        --page-h: 100vh;
+      }
+      html {
+        font-family: var(--sans);
+        background: var(--white);
+        color: var(--black);
+        scroll-behavior: smooth;
+        overflow: hidden;
+      }
+      body {
+        display: flex;
+        flex-direction: row;
+        width: calc(var(--page-w) * 10);
+        height: var(--page-h);
+      }
+      .page {
+        width: var(--page-w);
+        height: var(--page-h);
+        flex-shrink: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        padding: 48px 64px;
+        border-right: 1px solid var(--light-gray);
+      }
+      .page::-webkit-scrollbar {
+        width: 4px;
+      }
+      .page::-webkit-scrollbar-thumb {
+        background: var(--gray);
+      }
+      .cover {
+        justify-content: center;
+        background: var(--black);
+        color: var(--white);
+        border-right: none;
+      }
+      .cover .accent-line {
+        background: var(--white);
+      }
+      .cover .meta {
+        color: var(--gray);
+      }
+      .accent-line {
+        width: 48px;
+        height: 4px;
+        background: var(--blue);
+        margin-bottom: 24px;
+      }
+      .meta {
+        font-family: var(--mono);
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--gray);
+        margin-bottom: 4px;
+      }
+      h1 {
+        font-size: clamp(48px, 7vw, 88px);
+        font-weight: 900;
+        line-height: 0.9;
+        letter-spacing: -0.03em;
+        margin-bottom: 16px;
+      }
+      h1 .highlight {
+        color: var(--blue);
+      }
+      .cover h1 .highlight {
+        color: var(--white);
+        text-decoration: underline;
+        text-decoration-color: var(--blue);
+        text-underline-offset: 8px;
+      }
+      h2 {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+      }
+      h3 {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--blue);
+        margin-bottom: 4px;
+        margin-top: 16px;
+      }
+      .subtitle {
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--gray);
+        max-width: 540px;
+        margin-bottom: 32px;
+      }
+      .pill {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 4px 10px;
+        border: 1px solid var(--light-gray);
+        margin-bottom: 16px;
+      }
+      .pill-num {
+        background: var(--blue);
+        color: var(--white);
+        border: none;
+        padding: 4px 10px;
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        margin-bottom: 16px;
+        display: inline-block;
+      }
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-width: 700px;
+      }
+      .content p,
+      .content li {
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--black);
+      }
+      .content ul {
+        padding-left: 20px;
+      }
+      .content li {
+        margin-bottom: 4px;
+      }
+      .content strong {
+        font-weight: 600;
+      }
+      code {
+        font-family: var(--mono);
+        font-size: 11px;
+        background: var(--paper);
+        padding: 1px 5px;
+        border-radius: 2px;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 11px;
+        line-height: 1.5;
+        background: var(--paper);
+        padding: 12px 16px;
+        overflow-x: auto;
+        border-radius: 2px;
+        margin: 4px 0 8px;
+      }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 2px;
+        margin: 16px 0;
+        border: 1px solid var(--black);
+      }
+      .summary-grid > div {
+        background: var(--paper);
+        padding: 16px 20px;
+      }
+      .summary-grid .num {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .summary-grid .label {
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--gray);
+        margin-top: 4px;
+      }
+      .endpoints {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin: 8px 0;
+      }
+      .ep {
+        display: flex;
+        gap: 12px;
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--light-gray);
+      }
+      .ep-method {
+        font-weight: 600;
+        color: var(--blue);
+        min-width: 48px;
+      }
+      .ep-path {
+        flex: 1;
+      }
+      .ep-desc {
+        color: var(--gray);
+        flex: 1;
+      }
+      .verify {
+        background: var(--green);
+        color: #fff;
+        padding: 2px 8px;
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 2px;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .verify-warn {
+        background: #b8860b;
+        color: #fff;
+        padding: 2px 8px;
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 2px;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .verify-fail {
+        background: var(--red);
+        color: #fff;
+        padding: 2px 8px;
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        border-radius: 2px;
+        display: inline-block;
+        margin-right: 6px;
+      }
+      .cmd-block {
+        margin: 4px 0;
+      }
+      .cmd-block pre {
+        margin: 0;
+      }
+      .cmd-label {
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--gray);
+        margin-bottom: 4px;
+      }
+      .result-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        padding: 4px 0;
+        font-size: 12px;
+        font-family: var(--mono);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .status-dot.green {
+        background: var(--green);
+      }
+      .status-dot.red {
+        background: var(--red);
+      }
+      .status-dot.amber {
+        background: #b8860b;
+      }
+      .key-val {
+        font-family: var(--mono);
+        font-size: 11px;
+        background: var(--paper);
+        padding: 2px 6px;
+        border-radius: 2px;
+      }
+      .nav-dots {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 100;
+      }
+      .nav-dots a {
+        display: block;
+        width: 10px;
+        height: 10px;
+        border: 1.5px solid var(--black);
+        border-radius: 50%;
+        transition: background 0.2s;
+      }
+      .nav-dots a:hover {
+        background: var(--blue);
+        border-color: var(--blue);
+      }
+      .nav-dots a.active {
+        background: var(--black);
+      }
+      .nav-arrows {
+        position: fixed;
+        bottom: 24px;
+        right: 32px;
+        display: flex;
+        gap: 8px;
+        z-index: 100;
+      }
+      .nav-arrows a {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        border: 1.5px solid var(--black);
+        text-decoration: none;
+        color: var(--black);
+        transition: background 0.2s;
+      }
+      .nav-arrows a:hover {
+        background: var(--black);
+        color: var(--white);
+      }
+      .hint {
+        position: fixed;
+        bottom: 24px;
+        left: 32px;
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--gray);
+        z-index: 100;
+      }
+      .result-card {
+        border: 1px solid var(--black);
+        padding: 16px 20px;
+        background: var(--white);
+        margin: 8px 0;
+      }
+      .result-card .header {
+        font-family: var(--mono);
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: var(--gray);
+        margin-bottom: 8px;
+      }
+      @media (max-width: 768px) {
+        .page {
+          padding: 24px 20px;
+        }
+        h1 {
+          font-size: 32px;
+        }
+        h2 {
+          font-size: 22px;
+        }
+        .subtitle {
+          font-size: 13px;
+        }
+        .summary-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .hint,
+        .nav-arrows {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══════════ COVER ═══════════ -->
+    <div class="page cover" id="cover">
+      <div class="accent-line"></div>
+      <p class="meta">Focus.AI Labs · Validation Report</p>
+      <h1>USAGE<br />MONITOR</h1>
+      <p class="subtitle" style="color: var(--gray)">
+        All 7 slices validated
+        <span style="color: var(--green)">16 May 2026</span>
+      </p>
+      <div style="flex: 1"></div>
+      <div
+        style="display: flex; gap: 48px; margin-bottom: 32px; flex-wrap: wrap"
+      >
+        <div>
+          <span
+            style="font-family: var(--mono); font-size: 24px; font-weight: 700"
+            >7/7</span
+          ><br /><span
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+            >Slices pass</span
+          >
+        </div>
+        <div>
+          <span
+            style="font-family: var(--mono); font-size: 24px; font-weight: 700"
+            >138</span
+          ><br /><span
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+            >Tests</span
+          >
+        </div>
+        <div>
+          <span
+            style="font-family: var(--mono); font-size: 24px; font-weight: 700"
+            >$96.11</span
+          ><br /><span
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+            >OpenRouter balance</span
+          >
+        </div>
+        <div>
+          <span
+            style="font-family: var(--mono); font-size: 24px; font-weight: 700"
+            >14</span
+          ><br /><span
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+            >Providers checked</span
+          >
+        </div>
+      </div>
+      <p style="font-family: var(--mono); font-size: 10px; color: var(--gray)">
+        ← → Navigate · Click dots to jump
+      </p>
+    </div>
 
-<!-- ═══════════ COVER ═══════════ -->
-<div class="page cover" id="cover">
-  <div class="accent-line"></div>
-  <p class="meta">Focus.AI Labs · Validation Report</p>
-  <h1>USAGE<br>MONITOR</h1>
-  <p class="subtitle" style="color:var(--gray);">All 7 slices validated <span style="color:var(--green)">16 May 2026</span></p>
-  <div style="flex:1;"></div>
-  <div style="display:flex;gap:48px;margin-bottom:32px;flex-wrap:wrap;">
-    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">7/7</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Slices pass</span></div>
-    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">138</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Tests</span></div>
-    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">$96.11</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">OpenRouter balance</span></div>
-    <div><span style="font-family:var(--mono);font-size:24px;font-weight:700;">14</span><br><span style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Providers checked</span></div>
-  </div>
-  <p style="font-family:var(--mono);font-size:10px;color:var(--gray);">← → Navigate · Click dots to jump</p>
-</div>
+    <!-- ═══════════ SLICE 1 ═══════════ -->
+    <div class="page" id="s1">
+      <span class="pill-num">01</span>
+      <h2>New schema + server boots clean</h2>
+      <p class="subtitle">
+        Strip 8 old tables → 3. Delete encryption, Clerk auth, OAuth, old
+        routes.
+      </p>
 
-<!-- ═══════════ SLICE 1 ═══════════ -->
-<div class="page" id="s1">
-  <span class="pill-num">01</span>
-  <h2>New schema + server boots clean</h2>
-  <p class="subtitle">Strip 8 old tables → 3. Delete encryption, Clerk auth, OAuth, old routes.</p>
+      <div class="result-card">
+        <div class="header">2026-05-16 00:41 UTC</div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Server boots —
+          <span class="key-val">GET /api/health</span> →
+          <span class="key-val">{"status":"ok","database":"connected"}</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> DB has exactly 3 tables:
+          <span class="key-val">clients</span>,
+          <span class="key-val">usage_checks</span>,
+          <span class="key-val">notification_log</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Old routes return SPA HTML (not JSON)
+          — <span class="key-val">content-type: text/html</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot amber"></span>
+          <span class="verify-warn">TIMEOUT</span> 1 test hit vitest 5s limit
+          (slow DB connect) — 3/4 pass
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> No references to Clerk/encrypt/oauth
+          in source code
+        </div>
+      </div>
 
-  <div class="result-card">
-    <div class="header">2026-05-16 00:41 UTC</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Server boots — <span class="key-val">GET /api/health</span> → <span class="key-val">{"status":"ok","database":"connected"}</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> DB has exactly 3 tables: <span class="key-val">clients</span>, <span class="key-val">usage_checks</span>, <span class="key-val">notification_log</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Old routes return SPA HTML (not JSON) — <span class="key-val">content-type: text/html</span></div>
-    <div class="result-row"><span class="status-dot amber"></span> <span class="verify-warn">TIMEOUT</span> 1 test hit vitest 5s limit (slow DB connect) — 3/4 pass</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> No references to Clerk/encrypt/oauth in source code</div>
-  </div>
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+curl -s http://localhost:3000/api/health
+# → {"status":"ok","timestamp":"...","database":"connected"}</pre
+        >
+      </div>
+    </div>
 
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>curl -s http://localhost:3000/api/health
-# → {"status":"ok","timestamp":"...","database":"connected"}</pre>
-  </div>
-</div>
+    <!-- ═══════════ SLICE 2 ═══════════ -->
+    <div class="page" id="s2">
+      <span class="pill-num">02</span>
+      <h2>Client registry API</h2>
+      <p class="subtitle">
+        CRUD operations for clients. syncFromDiscovery for 1Password
+        reconciliation.
+      </p>
 
-<!-- ═══════════ SLICE 2 ═══════════ -->
-<div class="page" id="s2">
-  <span class="pill-num">02</span>
-  <h2>Client registry API</h2>
-  <p class="subtitle">CRUD operations for clients. syncFromDiscovery for 1Password reconciliation.</p>
+      <div class="result-card">
+        <div class="header">2026-05-16 00:43 UTC</div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span>
+          <span class="key-val">GET /api/clients</span> returns
+          <span class="key-val">2 clients</span> (1 active from test, 1
+          deactivated)
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Response includes
+          <span class="key-val">lastCheckStatus</span>,
+          <span class="key-val">lastCheckAt</span>, threshold fields
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> 12 slice2 tests pass (DB CRUD +
+          syncFromDiscovery + API)
+        </div>
+      </div>
 
-  <div class="result-card">
-    <div class="header">2026-05-16 00:43 UTC</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> <span class="key-val">GET /api/clients</span> returns <span class="key-val">2 clients</span> (1 active from test, 1 deactivated)</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Response includes <span class="key-val">lastCheckStatus</span>, <span class="key-val">lastCheckAt</span>, threshold fields</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> 12 slice2 tests pass (DB CRUD + syncFromDiscovery + API)</div>
-  </div>
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+curl -s http://localhost:3000/api/clients | jq '.clients | length'
+# → 2</pre
+        >
+      </div>
+    </div>
 
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>curl -s http://localhost:3000/api/clients | jq '.clients | length'
-# → 2</pre>
-  </div>
-</div>
+    <!-- ═══════════ SLICE 3 ═══════════ -->
+    <div class="page" id="s3">
+      <span class="pill-num">03</span>
+      <h2>Manual provider check via env var</h2>
+      <p class="subtitle">
+        Run provider checks using env vars. Store results in DB. Usage history
+        queries.
+      </p>
 
-<!-- ═══════════ SLICE 3 ═══════════ -->
-<div class="page" id="s3">
-  <span class="pill-num">03</span>
-  <h2>Manual provider check via env var</h2>
-  <p class="subtitle">Run provider checks using env vars. Store results in DB. Usage history queries.</p>
+      <div class="result-card">
+        <div class="header">2026-05-16 00:43 UTC</div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span>
+          <span class="key-val">POST /api/check</span> ran all 14 providers
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span>
+          <span class="key-val">openrouter</span> → ✅ success — balance
+          <span class="key-val">$96.11</span>, spend
+          <span class="key-val">$643.89</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> 13 others → ❌
+          <span class="key-val">"X not set in environment"</span> (expected — no
+          env vars)
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Results persisted in
+          <span class="key-val">usage_checks</span> table
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Error isolation — single provider
+          failure doesn't block others
+        </div>
+      </div>
 
-  <div class="result-card">
-    <div class="header">2026-05-16 00:43 UTC</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> <span class="key-val">POST /api/check</span> ran all 14 providers</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> <span class="key-val">openrouter</span> → ✅ success — balance <span class="key-val">$96.11</span>, spend <span class="key-val">$643.89</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> 13 others → ❌ <span class="key-val">"X not set in environment"</span> (expected — no env vars)</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Results persisted in <span class="key-val">usage_checks</span> table</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Error isolation — single provider failure doesn't block others</div>
-  </div>
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+curl -s -X POST http://localhost:3000/api/check | jq '.summary'
+# → {"total":14,"succeeded":1,"failed":13}</pre
+        >
+      </div>
+    </div>
 
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>curl -s -X POST http://localhost:3000/api/check | jq '.summary'
-# → {"total":14,"succeeded":1,"failed":13}</pre>
-  </div>
-</div>
+    <!-- ═══════════ SLICE 4 ═══════════ -->
+    <div class="page" id="s4">
+      <span class="pill-num">04</span>
+      <h2>1Password auto-discovery</h2>
+      <p class="subtitle">
+        Read thefocus vault, discover client SAs, find API keys. Injectable op
+        CLI runner.
+      </p>
 
-<!-- ═══════════ SLICE 4 ═══════════ -->
-<div class="page" id="s4">
-  <span class="pill-num">04</span>
-  <h2>1Password auto-discovery</h2>
-  <p class="subtitle">Read thefocus vault, discover client SAs, find API keys. Injectable op CLI runner.</p>
+      <div class="result-card">
+        <div class="header">2026-05-16 00:43 UTC</div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span>
+          <span class="key-val">POST /api/sync</span> with no token →
+          <span class="key-val">503</span> + helpful error message
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> 12 slice4 tests pass (mocked op CLI
+          output)
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Provider-to-env-var map covers all 14
+          providers
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Handles missing
+          <span class="key-val">OP_SERVICE_ACCOUNT_TOKEN</span> gracefully
+          (returns empty, not crash)
+        </div>
+      </div>
 
-  <div class="result-card">
-    <div class="header">2026-05-16 00:43 UTC</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> <span class="key-val">POST /api/sync</span> with no token → <span class="key-val">503</span> + helpful error message</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> 12 slice4 tests pass (mocked op CLI output)</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Provider-to-env-var map covers all 14 providers</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Handles missing <span class="key-val">OP_SERVICE_ACCOUNT_TOKEN</span> gracefully (returns empty, not crash)</div>
-  </div>
-
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>curl -s -X POST http://localhost:3000/api/sync | jq .
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+curl -s -X POST http://localhost:3000/api/sync | jq .
 # → {"error":"OP_SERVICE_ACCOUNT_TOKEN not set",...}
 
 # With a real 1Password token:
 export OP_SERVICE_ACCOUNT_TOKEN="ops_..."
-curl -s -X POST http://localhost:3000/api/sync | jq '.clients | length'</pre>
-  </div>
-</div>
+curl -s -X POST http://localhost:3000/api/sync | jq '.clients | length'</pre
+        >
+      </div>
+    </div>
 
-<!-- ═══════════ SLICE 5 ═══════════ -->
-<div class="page" id="s5">
-  <span class="pill-num">05</span>
-  <h2>Full auto-cycle + notifications</h2>
-  <p class="subtitle">Discovery → check → store → notify. Per-client thresholds. Cron scheduler.</p>
+    <!-- ═══════════ SLICE 5 ═══════════ -->
+    <div class="page" id="s5">
+      <span class="pill-num">05</span>
+      <h2>Full auto-cycle + notifications</h2>
+      <p class="subtitle">
+        Discovery → check → store → notify. Per-client thresholds. Cron
+        scheduler.
+      </p>
 
-  <div class="result-card">
-    <div class="header">2026-05-16 00:44 UTC</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> <span class="key-val">POST /api/full-cycle</span> runs discovery + check + notify + status file</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Scheduler starts on server boot: <span class="key-val">[scheduler] Started</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Notification thresholds evaluated per client</div>
-    <div class="result-row"><span class="status-dot amber"></span> <span class="verify-warn">SLOW</span> Full cycle takes ~6-8s (OpenRouter API call). Normal for real provider check.</div>
-  </div>
+      <div class="result-card">
+        <div class="header">2026-05-16 00:44 UTC</div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span>
+          <span class="key-val">POST /api/full-cycle</span> runs discovery +
+          check + notify + status file
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Scheduler starts on server boot:
+          <span class="key-val">[scheduler] Started</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Notification thresholds evaluated per
+          client
+        </div>
+        <div class="result-row">
+          <span class="status-dot amber"></span>
+          <span class="verify-warn">SLOW</span> Full cycle takes ~6-8s
+          (OpenRouter API call). Normal for real provider check.
+        </div>
+      </div>
 
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal (allow ~10s)</div>
-    <pre>time curl -s -X POST http://localhost:3000/api/full-cycle | \
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal (allow ~10s)</div>
+        <pre>
+time curl -s -X POST http://localhost:3000/api/full-cycle | \
   jq '{status, summary}'
-# → {"status":"ok","summary":{"total":14,"succeeded":1,...}}</pre>
-  </div>
-</div>
-
-<!-- ═══════════ SLICE 6 ═══════════ -->
-<div class="page" id="s6">
-  <span class="pill-num">06</span>
-  <h2>Dashboard UI</h2>
-  <p class="subtitle">React SPA. Client list with drill-down. No auth. No key management.</p>
-
-  <div class="result-card">
-    <div class="header">2026-05-16 00:45 UTC</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Dashboard serves at <span class="key-val">http://localhost:3000/</span> → HTTP 200</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Content-Type: <span class="key-val">text/html; charset=utf-8</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Contains <span class="key-val">"USAGE MONITOR"</span> hero header</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Vite build: <span class="key-val">30 modules, 461ms</span></div>
-  </div>
-
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Browser</div>
-    <pre>open http://localhost:3000</pre>
-  </div>
-</div>
-
-<!-- ═══════════ SLICE 7 ═══════════ -->
-<div class="page" id="s7">
-  <span class="pill-num">07</span>
-  <h2>Status file output</h2>
-  <p class="subtitle">Atomic JSON status file after each check cycle. Consumable by pi agent skills.</p>
-
-  <div class="result-card">
-    <div class="header">2026-05-16 00:44 UTC — <span class="key-val">~/.usage-monitor/status.json</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> File exists at default path</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Format matches schema: <span class="key-val">checkedAt</span>, <span class="key-val">clients</span>, <span class="key-val">summary</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Per-provider: balance, spend, status, lastChecked</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Summary: <span class="key-val">14 keys</span>, <span class="key-val">1 healthy</span>, <span class="key-val">13 errors</span>, <span class="key-val">0 critical</span></div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Atomic write (no <span class="key-val">.tmp</span> files left behind)</div>
-    <div class="result-row"><span class="status-dot green"></span> <span class="verify">PASS</span> Configurable via <span class="key-val">STATUS_OUTPUT_PATH</span> env var</div>
-  </div>
-
-  <h3>Live check</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>cat ~/.usage-monitor/status.json | jq '.summary'
-# → {"totalKeys":14,"healthy":1,"errors":13,"critical":0}</pre>
-  </div>
-</div>
-
-<!-- ═══════════ RESULTS ═══════════ -->
-<div class="page" id="results">
-  <span class="pill-num">✓</span>
-  <h2>All slices validated</h2>
-  <p class="subtitle">7/7 passing. 138 tests. Ready for operation.</p>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin:32px 0;border:1px solid var(--black);">
-    <div style="background:var(--paper);padding:20px;">
-      <div style="font-size:36px;font-weight:700;letter-spacing:-0.02em;">7</div>
-      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Slices complete</div>
+# → {"status":"ok","summary":{"total":14,"succeeded":1,...}}</pre
+        >
+      </div>
     </div>
-    <div style="background:var(--paper);padding:20px;">
-      <div style="font-size:36px;font-weight:700;letter-spacing:-0.02em;">138</div>
-      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Tests passing</div>
-    </div>
-    <div style="background:var(--paper);padding:20px;">
-      <div style="font-size:36px;font-weight:700;letter-spacing:-0.02em;">14</div>
-      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">Provider integrations</div>
-    </div>
-    <div style="background:var(--paper);padding:20px;">
-      <div style="font-size:36px;font-weight:700;letter-spacing:-0.02em;">$96</div>
-      <div style="font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:0.12em;color:var(--gray);">OpenRouter balance</div>
-    </div>
-  </div>
 
-  <h3>How to start</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>mise server
+    <!-- ═══════════ SLICE 6 ═══════════ -->
+    <div class="page" id="s6">
+      <span class="pill-num">06</span>
+      <h2>Dashboard UI</h2>
+      <p class="subtitle">
+        React SPA. Client list with drill-down. No auth. No key management.
+      </p>
+
+      <div class="result-card">
+        <div class="header">2026-05-16 00:45 UTC</div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Dashboard serves at
+          <span class="key-val">http://localhost:3000/</span> → HTTP 200
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Content-Type:
+          <span class="key-val">text/html; charset=utf-8</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Contains
+          <span class="key-val">"USAGE MONITOR"</span> hero header
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Vite build:
+          <span class="key-val">30 modules, 461ms</span>
+        </div>
+      </div>
+
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Browser</div>
+        <pre>open http://localhost:3000</pre>
+      </div>
+    </div>
+
+    <!-- ═══════════ SLICE 7 ═══════════ -->
+    <div class="page" id="s7">
+      <span class="pill-num">07</span>
+      <h2>Status file output</h2>
+      <p class="subtitle">
+        Atomic JSON status file after each check cycle. Consumable by pi agent
+        skills.
+      </p>
+
+      <div class="result-card">
+        <div class="header">
+          2026-05-16 00:44 UTC —
+          <span class="key-val">~/.usage-monitor/status.json</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> File exists at default path
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Format matches schema:
+          <span class="key-val">checkedAt</span>,
+          <span class="key-val">clients</span>,
+          <span class="key-val">summary</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Per-provider: balance, spend, status,
+          lastChecked
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Summary:
+          <span class="key-val">14 keys</span>,
+          <span class="key-val">1 healthy</span>,
+          <span class="key-val">13 errors</span>,
+          <span class="key-val">0 critical</span>
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Atomic write (no
+          <span class="key-val">.tmp</span> files left behind)
+        </div>
+        <div class="result-row">
+          <span class="status-dot green"></span>
+          <span class="verify">PASS</span> Configurable via
+          <span class="key-val">STATUS_OUTPUT_PATH</span> env var
+        </div>
+      </div>
+
+      <h3>Live check</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+cat ~/.usage-monitor/status.json | jq '.summary'
+# → {"totalKeys":14,"healthy":1,"errors":13,"critical":0}</pre
+        >
+      </div>
+    </div>
+
+    <!-- ═══════════ RESULTS ═══════════ -->
+    <div class="page" id="results">
+      <span class="pill-num">✓</span>
+      <h2>All slices validated</h2>
+      <p class="subtitle">7/7 passing. 138 tests. Ready for operation.</p>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2px;
+          margin: 32px 0;
+          border: 1px solid var(--black);
+        "
+      >
+        <div style="background: var(--paper); padding: 20px">
+          <div
+            style="font-size: 36px; font-weight: 700; letter-spacing: -0.02em"
+          >
+            7
+          </div>
+          <div
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+          >
+            Slices complete
+          </div>
+        </div>
+        <div style="background: var(--paper); padding: 20px">
+          <div
+            style="font-size: 36px; font-weight: 700; letter-spacing: -0.02em"
+          >
+            138
+          </div>
+          <div
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+          >
+            Tests passing
+          </div>
+        </div>
+        <div style="background: var(--paper); padding: 20px">
+          <div
+            style="font-size: 36px; font-weight: 700; letter-spacing: -0.02em"
+          >
+            14
+          </div>
+          <div
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+          >
+            Provider integrations
+          </div>
+        </div>
+        <div style="background: var(--paper); padding: 20px">
+          <div
+            style="font-size: 36px; font-weight: 700; letter-spacing: -0.02em"
+          >
+            $96
+          </div>
+          <div
+            style="
+              font-family: var(--mono);
+              font-size: 9px;
+              text-transform: uppercase;
+              letter-spacing: 0.12em;
+              color: var(--gray);
+            "
+          >
+            OpenRouter balance
+          </div>
+        </div>
+      </div>
+
+      <h3>How to start</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+mise server
 # or: pnpm server
 
 # Then open:
-open http://localhost:3000</pre>
-  </div>
+open http://localhost:3000</pre
+        >
+      </div>
 
-  <h3>Run all tests</h3>
-  <div class="cmd-block">
-    <div class="cmd-label">Terminal</div>
-    <pre>pnpm test:run
-# → 13 files, 138 tests, all passing</pre>
-  </div>
-</div>
+      <h3>Run all tests</h3>
+      <div class="cmd-block">
+        <div class="cmd-label">Terminal</div>
+        <pre>
+pnpm test:run
+# → 13 files, 138 tests, all passing</pre
+        >
+      </div>
+    </div>
 
-<!-- ═══════════ NAVIGATION ═══════════ -->
-<div class="nav-dots" id="dots">
-  <a href="#cover"></a><a href="#s1"></a><a href="#s2"></a><a href="#s3"></a>
-  <a href="#s4"></a><a href="#s5"></a><a href="#s6"></a><a href="#s7"></a><a href="#results"></a>
-</div>
-<div class="hint">← → navigate</div>
-<div class="nav-arrows">
-  <a href="#" id="prev" style="display:none;">←</a>
-  <a href="#s1" id="next">→</a>
-</div>
+    <!-- ═══════════ NAVIGATION ═══════════ -->
+    <div class="nav-dots" id="dots">
+      <a href="#cover"></a><a href="#s1"></a><a href="#s2"></a
+      ><a href="#s3"></a> <a href="#s4"></a><a href="#s5"></a><a href="#s6"></a
+      ><a href="#s7"></a><a href="#results"></a>
+    </div>
+    <div class="hint">← → navigate</div>
+    <div class="nav-arrows">
+      <a href="#" id="prev" style="display: none">←</a>
+      <a href="#s1" id="next">→</a>
+    </div>
 
-<script>
-const pages=['cover','s1','s2','s3','s4','s5','s6','s7','results'];
-const dots=document.querySelectorAll('#dots a');
-const body=document.body;
-function updateNav(){
-  const s=body.scrollLeft,w=window.innerWidth,i=Math.round(s/w);
-  dots.forEach((d,j)=>d.classList.toggle('active',j===i+1));
-  const p=document.getElementById('prev'),n=document.getElementById('next');
-  p.style.display=i===0?'none':'flex';p.href='#'+pages[i-1];
-  n.style.display=i===pages.length-1?'none':'flex';n.href='#'+pages[i+1];
-}
-body.addEventListener('scroll',updateNav);
-window.addEventListener('resize',updateNav);
-updateNav();
-document.addEventListener('keydown',e=>{
-  const i=pages.indexOf(location.hash.slice(1));
-  if(e.key==='ArrowRight'&&i<pages.length-1)location.hash='#'+pages[i+1];
-  if(e.key==='ArrowLeft'&&i>0)location.hash='#'+pages[i-1];
-});
-</script>
-</body>
+    <script>
+      const pages = [
+        "cover",
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6",
+        "s7",
+        "results",
+      ];
+      const dots = document.querySelectorAll("#dots a");
+      const body = document.body;
+      function updateNav() {
+        const s = body.scrollLeft,
+          w = window.innerWidth,
+          i = Math.round(s / w);
+        dots.forEach((d, j) => d.classList.toggle("active", j === i + 1));
+        const p = document.getElementById("prev"),
+          n = document.getElementById("next");
+        p.style.display = i === 0 ? "none" : "flex";
+        p.href = "#" + pages[i - 1];
+        n.style.display = i === pages.length - 1 ? "none" : "flex";
+        n.href = "#" + pages[i + 1];
+      }
+      body.addEventListener("scroll", updateNav);
+      window.addEventListener("resize", updateNav);
+      updateNav();
+      document.addEventListener("keydown", (e) => {
+        const i = pages.indexOf(location.hash.slice(1));
+        if (e.key === "ArrowRight" && i < pages.length - 1)
+          location.hash = "#" + pages[i + 1];
+        if (e.key === "ArrowLeft" && i > 0) location.hash = "#" + pages[i - 1];
+      });
+    </script>
+  </body>
 </html>

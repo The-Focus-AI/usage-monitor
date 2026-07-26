@@ -1,4 +1,12 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach } from "vitest";
+import {
+	describe,
+	it,
+	expect,
+	beforeAll,
+	afterAll,
+	afterEach,
+	beforeEach,
+} from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { clients, usageChecks } from "../db/schema.js";
@@ -21,9 +29,11 @@ function makeTestClient(overrides?: Partial<NewClient>): NewClient {
 }
 
 async function cleanup() {
-	await db.delete(usageChecks).where(
-		sql`client_id IN (SELECT id FROM ${clients} WHERE name LIKE ${`${TEST_PREFIX}-%`})`,
-	);
+	await db
+		.delete(usageChecks)
+		.where(
+			sql`client_id IN (SELECT id FROM ${clients} WHERE name LIKE ${`${TEST_PREFIX}-%`})`,
+		);
 	await db.delete(clients).where(sql`name LIKE ${`${TEST_PREFIX}-%`}`);
 }
 
@@ -44,7 +54,10 @@ describe("Slice 7: Status file output", () => {
 
 	afterEach(async () => {
 		for (const id of clientIds) {
-			await db.delete(clients).where(eq(clients.id, id)).catch(() => {});
+			await db
+				.delete(clients)
+				.where(eq(clients.id, id))
+				.catch(() => {});
 		}
 		clientIds = [];
 	});
@@ -53,10 +66,12 @@ describe("Slice 7: Status file output", () => {
 		beforeEach(async () => {
 			const [c] = await db
 				.insert(clients)
-				.values(makeTestClient({
-					name: "Test Client A",
-					slug: `test-client-a-${Date.now()}`,
-				}))
+				.values(
+					makeTestClient({
+						name: "Test Client A",
+						slug: `test-client-a-${Date.now()}`,
+					}),
+				)
 				.returning({ id: clients.id });
 			testClientId = c!.id;
 			clientIds.push(testClientId);
@@ -86,9 +101,7 @@ describe("Slice 7: Status file output", () => {
 			const fs = await import("node:fs");
 			expect(fs.existsSync(TEST_OUTPUT_PATH)).toBe(true);
 
-			const content = JSON.parse(
-				fs.readFileSync(TEST_OUTPUT_PATH, "utf-8"),
-			);
+			const content = JSON.parse(fs.readFileSync(TEST_OUTPUT_PATH, "utf-8"));
 			expect(content).toHaveProperty("checkedAt");
 			expect(content).toHaveProperty("clients");
 			expect(content).toHaveProperty("summary");
@@ -101,9 +114,7 @@ describe("Slice 7: Status file output", () => {
 			await writeStatusFile();
 
 			const fs = await import("node:fs");
-			const content = JSON.parse(
-				fs.readFileSync(TEST_OUTPUT_PATH, "utf-8"),
-			);
+			const content = JSON.parse(fs.readFileSync(TEST_OUTPUT_PATH, "utf-8"));
 
 			expect(content.clients.length).toBeGreaterThanOrEqual(1);
 
@@ -137,9 +148,7 @@ describe("Slice 7: Status file output", () => {
 			await writeStatusFile();
 
 			const fs = await import("node:fs");
-			const content = JSON.parse(
-				fs.readFileSync(TEST_OUTPUT_PATH, "utf-8"),
-			);
+			const content = JSON.parse(fs.readFileSync(TEST_OUTPUT_PATH, "utf-8"));
 
 			expect(content.summary).toHaveProperty("totalKeys");
 			expect(content.summary).toHaveProperty("healthy");
@@ -177,7 +186,11 @@ describe("Slice 7: Status file output", () => {
 			await writeStatusFile();
 
 			const fs = await import("node:fs");
-			const defaultPath = path.join(os.homedir(), ".usage-monitor", "status.json");
+			const defaultPath = path.join(
+				os.homedir(),
+				".usage-monitor",
+				"status.json",
+			);
 			expect(fs.existsSync(defaultPath)).toBe(true);
 
 			// Cleanup

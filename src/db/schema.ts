@@ -5,6 +5,7 @@ import {
 	numeric,
 	pgTable,
 	text,
+	uniqueIndex,
 	timestamp,
 	uuid,
 } from "drizzle-orm/pg-core";
@@ -34,6 +35,31 @@ export const clients = pgTable(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => [index("clients_slug_idx").on(table.slug)],
+);
+
+// ── Client Key Inventory ──
+// Non-secret 1Password item inventory discovered from client vaults.
+export const clientKeyInventory = pgTable(
+	"client_key_inventory",
+	{
+		id: uuid("id").primaryKey().defaultRandom(),
+		clientId: uuid("client_id")
+			.notNull()
+			.references(() => clients.id, { onDelete: "cascade" }),
+		itemName: text("item_name").notNull(),
+		category: text("category").notNull(),
+		provider: text("provider"),
+		checker: text("checker"),
+		monitored: boolean("monitored").notNull().default(false),
+		lastDiscoveredAt: timestamp("last_discovered_at").defaultNow().notNull(),
+	},
+	(table) => [
+		index("client_key_inventory_client_idx").on(table.clientId),
+		uniqueIndex("client_key_inventory_client_item_unique").on(
+			table.clientId,
+			table.itemName,
+		),
+	],
 );
 
 // ── Usage Checks ──
@@ -85,6 +111,8 @@ export const notificationLog = pgTable(
 // ---- Type exports ----
 export type Client = typeof clients.$inferSelect;
 export type NewClient = typeof clients.$inferInsert;
+export type ClientKeyInventory = typeof clientKeyInventory.$inferSelect;
+export type NewClientKeyInventory = typeof clientKeyInventory.$inferInsert;
 export type UsageCheck = typeof usageChecks.$inferSelect;
 export type NewUsageCheck = typeof usageChecks.$inferInsert;
 export type NotificationLogEntry = typeof notificationLog.$inferSelect;

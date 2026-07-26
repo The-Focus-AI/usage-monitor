@@ -27,12 +27,41 @@ export interface UsageCheck {
 	errorMessage: string | null;
 }
 
+export interface DiscoveryPreviewKey {
+	itemName: string;
+	category: string;
+	provider: string | null;
+	checker: string | null;
+	monitored: boolean;
+}
+
+export interface DiscoveryPreviewClient {
+	id?: string;
+	name: string;
+	vaultName: string;
+	slug: string;
+	lastSyncedAt?: string | null;
+	keys: DiscoveryPreviewKey[];
+}
+
 const BASE_URL = "/api";
 
-async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
+async function fetchJson<T>(
+	path: string,
+	options: RequestInit = {},
+): Promise<T> {
+	const { headers: optionHeaders, body, ...restOptions } = options;
+	const headers = new Headers(optionHeaders);
+	const hasBody = body !== undefined && body !== null;
+
+	if (hasBody && !headers.has("Content-Type")) {
+		headers.set("Content-Type", "application/json");
+	}
+
 	const res = await fetch(`${BASE_URL}${path}`, {
-		headers: { "Content-Type": "application/json" },
-		...options,
+		...restOptions,
+		...(hasBody ? { body } : {}),
+		...(Array.from(headers).length > 0 ? { headers } : {}),
 	});
 	if (!res.ok) {
 		const body = await res.json().catch(() => ({}));
@@ -53,6 +82,25 @@ export async function fetchClientUsage(
 		`/clients/${clientId}/usage`,
 	);
 	return data.checks;
+}
+
+export async function fetchDiscoveryPreview(): Promise<
+	DiscoveryPreviewClient[]
+> {
+	const data = await fetchJson<{ clients: DiscoveryPreviewClient[] }>(
+		"/discovery-preview",
+	);
+	return data.clients;
+}
+
+export async function refreshDiscoveryPreview(): Promise<
+	DiscoveryPreviewClient[]
+> {
+	const data = await fetchJson<{ clients: DiscoveryPreviewClient[] }>(
+		"/discovery-preview/refresh",
+		{ method: "POST" },
+	);
+	return data.clients;
 }
 
 export async function triggerFullCycle(): Promise<{

@@ -167,7 +167,7 @@ export class OpenAIProvider extends BaseAPIProvider {
 					monthlySpend,
 					note:
 						monthlySpend > 0
-							? `Monthly spend via org costs API`
+							? usageNote
 							: "Key works for API calls but doesn't have organization billing access. Use an org admin key for spend data.",
 				},
 				billingPeriod: {
