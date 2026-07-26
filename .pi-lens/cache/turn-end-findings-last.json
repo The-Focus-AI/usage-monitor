@@ -1,4 +1,0 @@
-{
-  "signature": "src/server/scheduler.ts::ℹ️ Advisory — no action required this turn:\n⚠️ Newly unused exports in modified files — check if callers need updating (Knip):\n  src/server/scheduler.ts:101 — stopScheduler\n  src/server/scheduler.ts:112 — runManualCheck\n",
-  "sessionId": "lens-mp5p8jr3-a864fdeb"
-}

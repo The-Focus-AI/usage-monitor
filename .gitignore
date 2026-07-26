@@ -1,5 +1,7 @@
 node_modules/
-.pi/sessions/
+.pi/*
+!.pi/settings.json
+.pi-lens/
 .env
 .env.local
 .env.development
